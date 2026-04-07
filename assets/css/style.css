@@ -1,0 +1,667 @@
+/* ================= RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', 'Poppins', sans-serif;
+}
+
+/* ================= BODY ================= */
+body {
+  background: #f5f7fa;
+  color: #333;
+  transition: 0.3s;
+}
+
+/* ================= GLOBAL CONTAINER ================= */
+.container {
+  max-width: 1400px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(25px);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+/* NAV INNER */
+.nav-container {
+  max-width: 1400px;
+  margin: auto;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* LOGO */
+.logo {
+  font-size: 26px;
+  font-weight: 700;
+  color: #6a0dad;
+  letter-spacing: 0.5px;
+}
+
+/* NAV LINKS */
+.nav-links {
+  display: flex;
+  gap: 35px;
+  list-style: none;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
+  transition: 0.3s;
+}
+
+/* UNDERLINE EFFECT */
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  background: linear-gradient(90deg, #6a0dad, #9333ea);
+  left: 0;
+  bottom: -6px;
+  transition: 0.3s ease;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.nav-links a:hover {
+  color: #6a0dad;
+}
+
+/* RIGHT SIDE */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* BUTTON BASE */
+.login-btn,
+.signup-btn,
+.logout-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  text-decoration: none;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+/* LOGIN */
+.login-btn {
+  background: linear-gradient(135deg, #6a0dad, #9333ea);
+  color: #fff;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(106,13,173,0.3);
+}
+
+/* SIGNUP */
+.signup-btn {
+  background: #22c55e;
+  color: #fff;
+}
+
+/* LOGOUT */
+.logout-btn {
+  background: #ff4d4d;
+  color: #fff;
+}
+
+/* PROFILE */
+.profile-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #6a0dad;
+}
+
+/* THEME BUTTON */
+#theme-toggle {
+  border: none;
+  background: #f0f0f0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#theme-toggle:hover {
+  background: #ddd;
+}
+
+/* ================= HERO ================= */
+.hero {
+  position: relative;
+  height: 90vh;
+  background: url('../images/hotel.jpg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  padding: 0 6%;
+}
+
+/* OVERLAY */
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.75),
+    rgba(0, 0, 0, 0.2)
+  );
+  top: 0;
+  left: 0;
+}
+
+/* HERO CONTENT */
+.hero-content-left {
+  position: relative;
+  z-index: 2;
+  color: white;
+  max-width: 550px;
+}
+
+/* TITLE */
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  max-width: 600px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+}
+
+/* TYPEWRITER */
+#typewriter {
+  border-right: 3px solid #fff;
+  padding-right: 6px;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
+
+/* TEXT */
+.hero-content-left p {
+  margin-top: 15px;
+  font-size: 1.1rem;
+  color: #ddd;
+  line-height: 1.6;
+}
+
+/* BUTTONS */
+.hero-buttons {
+  margin-top: 25px;
+}
+
+.btn-primary {
+  background: #7b2cbf;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  text-decoration: none;
+  margin-right: 10px;
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  background: #5a189a;
+}
+
+.btn-secondary {
+  border: 2px solid #c77dff;
+  color: #c77dff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-secondary:hover {
+  background: #c77dff;
+  color: #240046;
+}
+
+/* ================= FOOTER ================= */
+.footer {
+  background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
+  color: #ccc;
+  padding-top: 60px;
+  margin-top: 80px;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+.footer-logo {
+  color: #9d4edd;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+}
+
+.footer-col h3 {
+  color: #fff;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.footer-col p {
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-col ul li {
+  margin-bottom: 10px;
+}
+
+.footer-col ul li a {
+  text-decoration: none;
+  color: #ccc;
+  transition: 0.3s;
+}
+
+.footer-col ul li a:hover {
+  color: #9d4edd;
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-top: 40px;
+  padding: 20px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+.footer-col ul li a {
+  position: relative;
+}
+
+.footer-col ul li a::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  bottom: -3px;
+  left: 0;
+  background: #9d4edd;
+  transition: 0.3s;
+}
+
+.footer-col ul li a:hover::after {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+
+/* ================= DARK MODE ================= */
+.dark {
+  background: #121212;
+  color: white;
+}
+
+.dark .navbar {
+  background: #1e1e1e;
+}
+
+.dark .nav-links a {
+  color: white;
+}
+
+.dark #theme-toggle {
+  background: #333;
+  color: white;
+}
+
+/* ================= ROOMS ================= */
+.rooms-section {
+  padding: 60px 0;
+  background: #f9fafc;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+/* GRID */
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+}
+
+/* CARD */
+.room-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: 0.3s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.room-card:hover {
+  transform: translateY(-6px);
+}
+
+/* IMAGE */
+.room-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: 0.4s;
+}
+
+.room-card:hover img {
+  transform: scale(1.05);
+}
+
+/* INFO */
+.room-info {
+  padding: 18px;
+}
+
+/* TITLE */
+.room-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 6px;
+}
+
+/* LOCATION */
+.room-info .location {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+/* FEATURES */
+.room-info .features {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 12px;
+  letter-spacing: 0.3px;
+}
+
+/* PRICE */
+.room-info .price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* BOTTOM ALIGNMENT */
+.room-info .bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.room-bottom span {
+  color: #6a0dad;
+  font-weight: 600;
+}
+
+.room-bottom button {
+  background: #6a0dad;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .rooms-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .rooms-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Profile Image */
+.profile-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid #7b2cbf;
+  transition: 0.3s ease;
+}
+
+.profile-img:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(123, 44, 191, 0.6);
+}
+
+/* Dropdown */
+.profile-dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 45px;
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  width: 220px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.profile-dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.dropdown-content .email {
+  font-size: 12px;
+  color: gray;
+}
+
+.dropdown-content a {
+  display: block;
+  margin-top: 8px;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown-content a:hover {
+  color: purple;
+}
+
+.profile-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+
+  border: 2px solid transparent;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #7b2cbf, #c77dff) border-box;
+
+  transition: all 0.3s ease;
+}
+
+.profile-img:hover {
+  transform: scale(1.1) rotate(2deg);
+}
+
+.dropdown-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdown-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  margin: 10px 0;
+}
+
+/* ================= MOBILE NAVBAR FIX ================= */
+
+.menu-toggle {
+  display: none;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+  .menu-toggle {
+    display: block;
+  }
+
+  /* Hide desktop nav */
+  nav {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(25px);
+    display: none;
+  }
+
+  nav.active {
+    display: block;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+  }
+
+  .nav-right {
+    display: none;
+  }
+}
+
+/* MOBILE AUTH */
+.mobile-auth {
+  display: none;
+  text-align: center;
+  padding-bottom: 15px;
+}
+
+.mobile-auth a {
+  display: block;
+  margin: 8px 0;
+  text-decoration: none;
+  color: #6a0dad;
+  font-weight: 500;
+}
+
+/* SHOW ONLY IN MOBILE */
+@media (max-width: 768px) {
+  .mobile-auth {
+    display: block;
+  }
+}
+
+/* ================= MOBILE LOGIN FIX ================= */
+
+.mobile-auth .login-btn {
+  display: block;
+  width: 90%;
+  margin: 15px auto 0;
+  text-align: center;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+/* Better spacing for mobile menu */
+.mobile-auth {
+  padding: 10px 0 20px;
+}
+
+/* Optional: improve link spacing */
+.mobile-auth a {
+  padding: 8px 0;
+}

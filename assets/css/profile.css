@@ -1,0 +1,217 @@
+/* ================= PROFILE PAGE ================= */
+.profile-page {
+  padding: 40px;
+  background: linear-gradient(135deg, #f5f7fa, #eef1f7);
+  min-height: 100vh;
+}
+
+/* ================= HERO ================= */
+.profile-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+  padding: 30px;
+  border-radius: 18px;
+  color: white;
+  margin-bottom: 30px;
+  box-shadow: 0 15px 35px rgba(123, 44, 191, 0.3);
+  transition: 0.3s;
+}
+
+.profile-hero:hover {
+  transform: translateY(-3px);
+}
+
+/* ================= LEFT ================= */
+.hero-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* AVATAR */
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid white;
+  object-fit: cover;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* TEXT */
+.user-info h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.user-info p {
+  margin: 4px 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* BADGE */
+.badge {
+  display: inline-block;
+  margin-top: 6px;
+  background: #00c853;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ================= ACTION BUTTONS ================= */
+.hero-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.edit-btn,
+.hero-actions .logout {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.3s;
+}
+
+.edit-btn {
+  background: white;
+  color: #333;
+}
+
+.edit-btn:hover {
+  background: #f1f1f1;
+}
+
+.hero-actions .logout {
+  background: #ff3b3b;
+  color: white;
+}
+
+.hero-actions .logout:hover {
+  background: #e02d2d;
+}
+
+/* ================= GRID ================= */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 25px;
+}
+
+/* ================= CARD ================= */
+.card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(25px);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+/* ================= STATS ================= */
+.stats {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.stats h4 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.stats p {
+  font-size: 12px;
+  color: #777;
+}
+
+/* ================= BOOKINGS ================= */
+.booking {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8f9fc;
+  margin-top: 12px;
+  transition: 0.3s;
+}
+
+.booking:hover {
+  background: #eef1f7;
+}
+
+/* STATUS */
+.status {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.confirmed {
+  background: #d4edda;
+  color: #2e7d32;
+}
+
+.pending {
+  background: #fff3cd;
+  color: #ff9800;
+}
+
+/* ================= BUTTON ================= */
+.full-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.full-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(157, 78, 221, 0.3);
+}
+
+/* ACTIVE TEXT */
+.active {
+  color: #2ecc71;
+  font-weight: 600;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .hero-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
