@@ -8,20 +8,24 @@ header('Content-Type: application/json');
 
 $api = new Api($razorpay['key_id'], $razorpay['secret']);
 
-// Get amount from frontend (₹)
-$amount_rupees = $_GET['amount'] ;
+// ✅ GET DATA FROM FRONTEND
+if (!isset($_GET['amount']) || !isset($_GET['room_id'])) {
+    echo json_encode(["error" => "Missing parameters"]);
+    exit;
+}
 
-// Convert to paise
-$amount = $amount_rupees * 1;
+$amount = (int) $_GET['amount'];   // already in paise
+$room_id = (int) $_GET['room_id'];
 
-// Dummy user (replace later)
+// Dummy user (replace later with session)
 $user_id = 1;
-$room_name = "Room Booking";
 
 // Create receipt
 $receipt = "order_" . time();
 
-// Create Razorpay order
+// ===============================
+// 1️⃣ CREATE RAZORPAY ORDER
+// ===============================
 $order = $api->order->create([
     'receipt'  => $receipt,
     'amount'   => $amount,
@@ -30,9 +34,12 @@ $order = $api->order->create([
 
 $order_id = $order['id'];
 
-// ✅ INSERT INTO DB (STRICT CHECK)
+// ===============================
+// 2️⃣ STORE IN DATABASE
+// ===============================
 $stmt = $conn->prepare("
-    INSERT INTO orders (user_id, room_name, amount, razorpay_order_id, receipt, status)
+    INSERT INTO orders 
+    (user_id, room_id, amount, razorpay_order_id, receipt, status)
     VALUES (?, ?, ?, ?, ?, ?)
 ");
 
@@ -44,7 +51,7 @@ if (!$stmt) {
 
 $status = "created";
 
-$stmt->bind_param("isisss", $user_id, $room_name, $amount, $order_id, $receipt, $status);
+$stmt->bind_param("iiisss", $user_id, $room_id, $amount, $order_id, $receipt, $status);
 
 if (!$stmt->execute()) {
     die(json_encode([
@@ -52,7 +59,9 @@ if (!$stmt->execute()) {
     ]));
 }
 
-// ✅ SUCCESS RESPONSE
+// ===============================
+// 3️⃣ RESPONSE
+// ===============================
 echo json_encode([
     'order_id' => $order_id,
     'amount'   => $amount

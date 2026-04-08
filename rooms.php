@@ -2,326 +2,85 @@
 
 <link rel="stylesheet" href="assets/css/rooms.css">
 
+<?php
+require_once __DIR__ . '/includes/config.php';
+
+// ✅ Show only available rooms
+$query = "SELECT * FROM rooms " ;
+$result = $conn->query($query);
+?>
+
 <section class="container">
-  
+
+  <!-- HEADER -->
+  <div class="rooms-header">
+    <div class="rooms-left">
+      <h2>Our Rooms</h2>
+      <p class="rooms-sub">Choose from our premium selection</p>
+    </div>
+
+    <select class="sort-dropdown">
+      <option>Sort by</option>
+      <option>Price Low to High</option>
+      <option>Price High to Low</option>
+    </select>
+  </div>
+
+  <!-- ROOM GRID -->
   <div class="room-grid">
 
-    <!-- ROOM 1 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room1.jpg">
-      </div>
-      <div class="room-info">
-        <div class="top">
-          <h3>Deluxe King Room</h3>
-          <span class="rating">⭐ 4.7</span>
-        </div>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">WiFi • AC • Breakfast</p>
-        <div class="bottom">
-          <p class="price">₹2,499</p>
-          <button class="pay-btn" data-price="2499" data-room="Deluxe King Room">Book Now</button>
-        </div>
-      </div>
+    <?php while($row = $result->fetch_assoc()) { ?>
+
+  <div class="room-card <?php echo ($row['status'] === 'booked') ? 'booked' : ''; ?>">
+    
+    <div class="image-container">
+
+      <img src="assets/images/<?php echo $row['image']; ?>" alt="room">
+
+      <?php if ($row['status'] === 'booked') { ?>
+        <div class="overlay">BOOKED</div>
+      <?php } ?>
+
     </div>
 
-    <!-- ROOM 2 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room2.jpg">
+    <div class="room-info">
+
+      <div class="top">
+        <h3><?php echo $row['name']; ?></h3>
+        <span class="rating">⭐ <?php echo $row['rating']; ?></span>
       </div>
-      <div class="room-info">
-        <h3>Deluxe Twin Room</h3>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">WiFi • AC • 2 Beds</p>
-        <div class="bottom">
-          <p class="price">₹2,799</p>
-           <button class="pay-btn" data-price="2799" data-room="Deluxe Twin Room">Book Now</button>
-        </div>
+
+      <p class="location"><?php echo $row['location']; ?></p>
+      <p class="features"><?php echo $row['features']; ?></p>
+
+      <div class="bottom">
+        <p class="price">₹<?php echo $row['price']; ?></p>
+
+        <?php if ($row['status'] === 'available') { ?>
+          <button 
+            class="pay-btn"
+            data-id="<?php echo $row['id']; ?>"
+            data-price="<?php echo $row['price']; ?>"
+            data-room="<?php echo $row['name']; ?>">
+            Book Now
+          </button>
+        <?php } else { ?>
+          <button class="pay-btn disabled">Booked</button>
+        <?php } ?>
+
       </div>
+
     </div>
 
-    <!-- ROOM 3 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room3.jpg">
-      </div>
-      <div class="room-info">
-        <h3>Executive Room</h3>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">WiFi • Workspace • AC</p>
-        <div class="bottom">
-          <p class="price">₹3,499</p>
-          <button class="pay-btn" data-price="3499" data-room="Executive Room">Book Now</button>
-        </div>
-      </div>
-    </div>
+  </div>
 
-    <!-- ROOM 4 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room4.jpg">
-      </div>
-      <div class="room-info">
-        <h3>Premium Room</h3>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">WiFi • AC • City View</p>
-        <div class="bottom">
-          <p class="price">₹3,999</p>
-          <button class="pay-btn" data-price="3999" data-room="Premium Room">Book Now</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROOM 5 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room5.jpg">
-      </div>
-      <div class="room-info">
-        <h3>Luxury Suite</h3>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">Suite • Lounge • Bathtub</p>
-        <div class="bottom">
-          <p class="price">₹5,999</p>
-          <button class="pay-btn" data-price="5999" data-room="Luxury Suite">Book Now</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROOM 6 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room6.jpg">
-      </div>
-      <div class="room-info">
-        <h3>Family Room</h3>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">4 Guests • AC • TV</p>
-        <div class="bottom">
-          <p class="price">₹4,499</p>
-          <button class="pay-btn" data-price="4499" data-room="Family Room">Book Now</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROOM 7 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room7.jpg">
-      </div>
-      <div class="room-info">
-        <h3>Studio Room</h3>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">Compact • WiFi • AC</p>
-        <div class="bottom">
-          <p class="price">₹2,199</p>
-          <button class="pay-btn" data-price="2199" data-room="Studio Room">Book Now</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROOM 8 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room8.jpg">
-      </div>
-      <div class="room-info">
-        <h3>Garden View Room</h3>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">Garden View • Balcony</p>
-        <div class="bottom">
-          <p class="price">₹3,199</p>
-          <button class="pay-btn" data-price="3199" data-room="Garden View Room">Book Now</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROOM 9 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room9.jpg">
-      </div>
-      <div class="room-info">
-        <h3>Business Room</h3>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">Desk • Fast WiFi</p>
-        <div class="bottom">
-          <p class="price">₹3,299</p>
-          <button class="pay-btn" data-price="3299" data-room="Business Room">Book Now</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROOM 10 -->
-    <div class="room-card">
-      <div class="image-container">
-        <img src="assets/images/room10.jpg">
-      </div>
-      <div class="room-info">
-        <h3>Presidential Suite</h3>
-        <p class="location">HotelLux, Ahmedabad</p>
-        <p class="features">Luxury • Private Lounge</p>
-        <div class="bottom">
-          <p class="price">₹9,999</p>
-          <button class="pay-btn" data-price="9999" data-room="Presidential Suite">Book Now</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room11.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Deluxe Room</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">Free WiFi • King Bed</p>
-    <div class="bottom">
-      <p class="price">₹2,499</p>
-      <button class="pay-btn" data-price="2499" data-room="Deluxe Room">Book Now</button>
-    </div>
-  </div>
-</div>
-
-<div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room12.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Executive Suite</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">City View • Workspace</p>
-    <div class="bottom">
-      <p class="price">₹4,999</p>
-      <button class="pay-btn" data-price="4999" data-room="Executive Suite">Book Now</button>
-    </div>
-  </div>
-</div>
-
-<div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room13.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Family Room</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">2 Beds • Spacious</p>
-    <div class="bottom">
-      <p class="price">₹3,499</p>
-      <button class="pay-btn" data-price="3499" data-room="Family Room">Book Now</button>
-    </div>
-  </div>
-</div>
-
-<div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room14.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Luxury Suite</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">Balcony • Jacuzzi</p>
-    <div class="bottom">
-      <p class="price">₹6,999</p>
-      <button class="pay-btn" data-price="6999" data-room="Luxury Suite">Book Now</button>
-    </div>
-  </div>
-</div>
-
-<div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room15.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Standard Room</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">AC • Free Breakfast</p>
-    <div class="bottom">
-      <p class="price">₹1,999</p>
-      <button class="pay-btn" data-price="1999" data-room="Standard Room">Book Now</button>
-    </div>
-  </div>
-</div>
-
-<div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room16.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Premium Room</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">Queen Bed • Smart TV</p>
-    <div class="bottom">
-      <p class="price">₹3,999</p>
-      <button class="pay-btn" data-price="3999" data-room="Premium Room">Book Now</button>
-    </div>
-  </div>
-</div>
-
-<div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room17.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Ocean View Suite</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">Panoramic View • Balcony</p>
-    <div class="bottom">
-      <p class="price">₹7,499</p>
-      <button class="pay-btn" data-price="7499" data-room="Ocean View Suite">Book Now</button>
-    </div>
-  </div>
-</div>
-
-<div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room18.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Business Room</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">Desk • High-Speed WiFi</p>
-    <div class="bottom">
-      <p class="price">₹3,199</p>
-      <button class="pay-btn" data-price="3199" data-room="Business Room">Book Now</button>
-    </div>
-  </div>
-</div>
-
-<div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room19.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Honeymoon Suite</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">Romantic Setup • Bathtub</p>
-    <div class="bottom">
-      <p class="price">₹8,499</p>
-      <button class="pay-btn" data-price="8499" data-room="Honeymoon Suite">Book Now</button>
-    </div>
-  </div>
-</div>
-
-<div class="room-card">
-  <div class="image-container">
-    <img src="assets/images/room20.jpg">
-  </div>
-  <div class="room-info">
-    <h3>Studio Room</h3>
-    <p class="location">HotelLux, Ahmedabad</p>
-    <p class="features">Compact • Modern Design</p>
-    <div class="bottom">
-      <p class="price">₹2,799</p>
-      <button class="pay-btn" data-price="2799" data-room="Studio Room">Book Now</button>
-    </div>
-  </div>
-</div>
+<?php } ?>
 
   </div>
+
 </section>
 
+<!-- ================= RAZORPAY ================= -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
@@ -329,49 +88,70 @@ document.querySelectorAll(".pay-btn").forEach(button => {
 
   button.addEventListener("click", async function () {
 
+    const roomId = this.dataset.id;
     const price = this.dataset.price;
     const room = this.dataset.room;
 
     const amount = price * 100;
 
-    const res = await fetch(`create_order.php?amount=${amount}`);
-    const data = await res.json();
+    try {
 
-    const options = {
-      key: "rzp_test_SahxQ39qIdVeKw", // 🔥 PUT YOUR REAL KEY
-      amount: data.amount,
-      currency: "INR",
-      name: "HotelLux",
-      description: room,
-      order_id: data.order_id,
+      // ✅ Create order with room_id
+      const res = await fetch(`create_order.php?amount=${amount}&room_id=${roomId}`);
+      const data = await res.json();
 
-      handler: function (response) {
+      if (data.error) {
+        alert("Error: " + data.error);
+        return;
+      }
 
-  fetch('verify_payment.php', {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      razorpay_payment_id: response.razorpay_payment_id,
-      razorpay_order_id: response.razorpay_order_id,
-      razorpay_signature: response.razorpay_signature,
+      const options = {
+        key: "rzp_test_SahxQ39qIdVeKw",
+        amount: data.amount,
+        currency: "INR",
+        name: "HotelLux",
+        description: room,
+        order_id: data.order_id,
 
-      // 🔥 THIS IS THE FIX
-      room: room,
-      amount: price
-    })
-  })
-  .then(res => res.text())
-  .then(data => {
-    alert(data);
-  });
+        handler: function (response) {
 
-}
-    };
+          // ✅ Send CORRECT DATA to backend
+          fetch('verify_payment.php', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              room_id: roomId,   // 🔥 FIXED
+              amount: price
+            })
+          })
+          .then(res => res.text())
+          .then(data => {
+            alert(data);
+            location.reload(); // ✅ refresh UI
+          });
 
-    const rzp = new Razorpay(options);
-    rzp.open();
+        },
+
+        modal: {
+          ondismiss: function () {
+            console.log("Payment popup closed");
+          }
+        }
+
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong during payment.");
+    }
 
   });
 

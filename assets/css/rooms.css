@@ -224,3 +224,34 @@ button:hover {
     gap: 15px;
   }
 }
+
+/* Blur booked room */
+.room-card.booked img {
+  filter: blur(4px);
+  opacity: 0.6;
+}
+
+/* Overlay */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  font-size: 26px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  letter-spacing: 2px;
+  border-radius: 16px;
+}
+
+/* Disable button */
+.pay-btn.disabled {
+  background: #aaa;
+  cursor: not-allowed;
+  pointer-events: none;
+}
