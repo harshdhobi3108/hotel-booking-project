@@ -1,22 +1,17 @@
 <?php
 require 'vendor/autoload.php';
-require 'includes/config.php';
+require __DIR__ . '/includes/config.php';
 
 use Razorpay\Api\Api;
 use Razorpay\Api\Errors\SignatureVerificationError;
 
-// DB connection
-$conn = new mysqli("localhost", "root", "", "hotel_booking");
-
-if ($conn->connect_error) {
-    die("DB Connection Failed: " . $conn->connect_error);
-}
-
+// Get JSON data
 $data = json_decode(file_get_contents("php://input"), true);
 
 // DEBUG (optional)
 file_put_contents("debug.txt", print_r($data, true));
 
+// Validate required fields
 if (
     !isset($data['razorpay_order_id']) ||
     !isset($data['razorpay_payment_id']) ||
@@ -26,26 +21,28 @@ if (
     exit;
 }
 
-$api = new Api(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET);
+// Razorpay init
+$api = new Api($razorpay['key_id'], $razorpay['secret']);
 
 try {
 
-    // ✅ VERIFY PAYMENT
+    // 🔐 VERIFY PAYMENT
     $api->utility->verifyPaymentSignature([
         'razorpay_order_id' => $data['razorpay_order_id'],
         'razorpay_payment_id' => $data['razorpay_payment_id'],
         'razorpay_signature' => $data['razorpay_signature']
     ]);
 
-    // 📦 DATA
+    // ✅ GET EXTRA DATA FROM FRONTEND
+    $room   = $data['room'] ?? 'Unknown Room';
+    $amount = $data['amount'] ?? 0;
+
     $payment_id = $data['razorpay_payment_id'];
     $order_id   = $data['razorpay_order_id'];
     $status     = "success";
 
-    // dummy (replace later)
+    // Dummy user (replace later)
     $user_id = 1;
-    $room = "Room Booking";
-    $amount = 0;
 
     // ✅ INSERT INTO DB
     $stmt = $conn->prepare("
@@ -54,10 +51,14 @@ try {
         VALUES (?, ?, ?, ?, ?, ?)
     ");
 
+    if (!$stmt) {
+        die("DB Error: " . $conn->error);
+    }
+
     $stmt->bind_param("isisss", $user_id, $room, $amount, $payment_id, $order_id, $status);
     $stmt->execute();
 
-    echo "Payment Saved Successfully ✅";
+    echo "Payment Successful ✅";
 
 } catch (SignatureVerificationError $e) {
 

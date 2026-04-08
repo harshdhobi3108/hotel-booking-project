@@ -338,7 +338,7 @@ document.querySelectorAll(".pay-btn").forEach(button => {
     const data = await res.json();
 
     const options = {
-      key: "rzp_test_SaJA7rxlFAE4Ex", // 🔥 PUT YOUR REAL KEY
+      key: "rzp_test_SahxQ39qIdVeKw", // 🔥 PUT YOUR REAL KEY
       amount: data.amount,
       currency: "INR",
       name: "HotelLux",
@@ -347,21 +347,27 @@ document.querySelectorAll(".pay-btn").forEach(button => {
 
       handler: function (response) {
 
-        console.log("RAZORPAY RESPONSE:", response); // 🔥 DEBUG
+  fetch('verify_payment.php', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      razorpay_payment_id: response.razorpay_payment_id,
+      razorpay_order_id: response.razorpay_order_id,
+      razorpay_signature: response.razorpay_signature,
 
-        fetch('verify_payment.php', {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(response)
-        })
-        .then(res => res.text())
-        .then(data => {
-          alert(data);
-        });
+      // 🔥 THIS IS THE FIX
+      room: room,
+      amount: price
+    })
+  })
+  .then(res => res.text())
+  .then(data => {
+    alert(data);
+  });
 
-      }
+}
     };
 
     const rzp = new Razorpay(options);

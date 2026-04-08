@@ -19,9 +19,10 @@ if (isset($_GET['code'])) {
 
     $_SESSION['user_name'] = $userInfo->name;
     $_SESSION['user_email'] = $userInfo->email;
-    $_SESSION['user_picture'] = !empty($userData->picture)
-        ? str_replace('=s96-c', '=s200-c', $userData->picture)
-        : 'https://ui-avatars.com/api/?name=' . urlencode($name);
+
+    $_SESSION['user_picture'] = !empty($userInfo->picture)
+        ? str_replace('=s96-c', '=s200-c', $userInfo->picture)
+        : 'https://ui-avatars.com/api/?name=' . urlencode($userInfo->name);
 
     header("Location: /hotel-booking/");
     exit;
