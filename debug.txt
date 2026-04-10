@@ -1,8 +1,6 @@
 Array
 (
-    [razorpay_payment_id] => pay_Sb3FnAItfbmQCN
-    [razorpay_order_id] => order_Sb3FbufCupyELM
-    [razorpay_signature] => ed335d117d3d1993df71bd5b3dcc9236402144225640d558f92779fca8c589bf
-    [room_id] => 7
-    [amount] => 2199
+    [razorpay_order_id] => order_Sbh2z3fGEDASUU
+    [razorpay_payment_id] => pay_Sbh3DJxxyWfew2
+    [razorpay_signature] => 2dfcf5ec125a610fb393e90d723888b56f625268118087c36711b925ec4ce7ef
 )

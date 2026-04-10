@@ -9,6 +9,16 @@ $dotenv->load();
 
 // ================= SESSION =================
 if (session_status() === PHP_SESSION_NONE) {
+
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => '', // keep empty for localhost
+        'secure' => false, // true only if HTTPS
+        'httponly' => true,
+        'samesite' => 'Lax' // 🔥 IMPORTANT
+    ]);
+
     session_start();
 }
 
