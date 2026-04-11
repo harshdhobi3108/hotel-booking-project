@@ -12,16 +12,15 @@ if (!isset($_SESSION['user_email'])) {
 
 include("includes/header.php");
 
+// ================= USER DATA =================
 $name    = $_SESSION['user_name'];
 $email   = $_SESSION['user_email'];
-$user_id = $_SESSION['user_id'] ?? 1; // replace later
+$user_id = $_SESSION['user_id'] ?? 1;
 $picture = $_SESSION['user_picture'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($name);
 
-// ===============================
-// ✅ FETCH ONLY CONFIRMED BOOKINGS
-// ===============================
+// ================= BOOKINGS =================
 $query = "
-SELECT r.name, r.price, o.status, o.created_at
+SELECT o.id as order_id, r.name, r.price, o.status, o.created_at
 FROM orders o
 JOIN rooms r ON o.room_id = r.id
 WHERE o.user_id = ? AND o.status = 'confirmed'
@@ -33,9 +32,7 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// ===============================
-// ✅ STATS
-// ===============================
+// ================= STATS =================
 $totalBookings = 0;
 $totalSpent = 0;
 $bookings = [];
@@ -64,7 +61,7 @@ while ($row = $result->fetch_assoc()) {
     </div>
 
     <div class="hero-actions">
-      <button class="edit-btn">Edit Profile</button>
+      <button class="edit-btn" onclick="openModal()">Edit Profile</button>
       <button class="logout" onclick="window.location.href='/hotel-booking/auth/logout.php'">Logout</button>
     </div>
   </div>
@@ -102,8 +99,9 @@ while ($row = $result->fetch_assoc()) {
     <!-- RIGHT -->
     <div class="right-panel">
 
+      <!-- BOOKINGS -->
       <div class="card">
-        <h3>Recent Bookings</h3>
+        <h3>Your Bookings</h3>
 
         <?php if (empty($bookings)) { ?>
           <p>No confirmed bookings yet.</p>
@@ -112,12 +110,30 @@ while ($row = $result->fetch_assoc()) {
           <?php foreach ($bookings as $b) { ?>
 
             <div class="booking">
-              <div>
+
+              <div class="booking-left">
                 <h4><?php echo htmlspecialchars($b['name']); ?></h4>
                 <p><?php echo date("d M Y", strtotime($b['created_at'])); ?></p>
+
+                <div class="booking-actions">
+
+                  <a href="/hotel-booking/my-bookings.php?id=<?php echo $b['order_id']; ?>" 
+                     class="primary-btn">
+                     Open Booking →
+                  </a>
+
+                  <a href="/hotel-booking/invoice.php?id=<?php echo $b['order_id']; ?>" 
+                     class="invoice-btn" target="_blank">
+                     Invoice
+                  </a>
+
+                </div>
               </div>
 
-              <span class="status confirmed">Confirmed</span>
+              <div class="booking-right">
+                <span class="status confirmed">Confirmed</span>
+              </div>
+
             </div>
 
           <?php } ?>
@@ -126,10 +142,10 @@ while ($row = $result->fetch_assoc()) {
 
       </div>
 
+      <!-- SETTINGS -->
       <div class="card">
         <h3>Account Settings</h3>
-        <button class="full-btn">Change Password</button>
-        <button class="full-btn">Update Profile</button>
+        <button class="full-btn" onclick="openModal()">Update Profile</button>
       </div>
 
     </div>
@@ -137,5 +153,43 @@ while ($row = $result->fetch_assoc()) {
   </div>
 
 </div>
+
+<!-- ================= MODAL ================= -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+
+    <h2>Edit Profile</h2>
+
+    <form action="/hotel-booking/update_profile.php" method="POST" enctype="multipart/form-data">
+      <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>" required>
+      <input type="file" name="profile_pic">
+      <button class="btn-primary" type="submit">Update Profile</button>
+    </form>
+
+    <hr>
+
+    <h3>Change Password</h3>
+
+    <form action="/hotel-booking/change_password.php" method="POST">
+      <input type="password" name="old_password" placeholder="Old Password" required>
+      <input type="password" name="new_password" placeholder="New Password" required>
+      <button class="btn-primary" type="submit">Change Password</button>
+    </form>
+
+    <button class="btn-secondary" onclick="closeModal()">Close</button>
+
+  </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+function openModal() {
+  document.getElementById("editModal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("editModal").style.display = "none";
+}
+</script>
 
 <?php include("includes/footer.php"); ?>
