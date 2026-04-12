@@ -2,6 +2,7 @@
 require_once("../../includes/auth_check.php");
 require_once("../../includes/db.php");
 
+// Fetch all rooms
 $result = $conn->query("SELECT * FROM rooms");
 ?>
 
@@ -112,7 +113,27 @@ $result = $conn->query("SELECT * FROM rooms");
             <th>Action</th>
         </tr>
 
-        <?php while($row = $result->fetch_assoc()) { ?>
+        <?php while($row = $result->fetch_assoc()) { 
+
+            // 🔥 CHECK IF ROOM IS CURRENTLY BOOKED (TODAY BASED)
+            $room_id = $row['id'];
+            $today = date('Y-m-d');
+
+            $checkQuery = "
+                SELECT id FROM orders 
+                WHERE room_id = '$room_id'
+                AND booking_date <= '$today'
+                AND check_out >= '$today'
+                LIMIT 1
+            ";
+
+            $checkResult = $conn->query($checkQuery);
+
+            $isBooked = $checkResult->num_rows > 0;
+
+            $status = $isBooked ? 'booked' : 'available';
+        ?>
+
         <tr>
             <td><?= $row['id'] ?></td>
 
@@ -121,8 +142,8 @@ $result = $conn->query("SELECT * FROM rooms");
             <td>₹<?= number_format($row['price']) ?></td>
 
             <td>
-                <span class="badge <?= $row['status'] ?>">
-                    <?= ucfirst($row['status']) ?>
+                <span class="badge <?= $status ?>">
+                    <?= ucfirst($status) ?>
                 </span>
             </td>
 
@@ -138,7 +159,9 @@ $result = $conn->query("SELECT * FROM rooms");
                 </a>
             </td>
         </tr>
+
         <?php } ?>
+
     </table>
 
 </div>

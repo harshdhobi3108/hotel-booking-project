@@ -35,6 +35,10 @@ body {
     left: 0;
     top: 0;
     padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
 }
 
 .sidebar h2 {
@@ -61,7 +65,7 @@ body {
     color: white;
 }
 
-/* ================= MAIN (FIXED) ================= */
+/* ================= MAIN ================= */
 .main {
     margin-left: 240px;
     padding: 30px;
@@ -72,7 +76,6 @@ body {
     flex-direction: column;
 }
 
-/* 🚀 IMPORTANT: FULL WIDTH CONTENT */
 .main > * {
     width: 100%;
 }
@@ -136,20 +139,14 @@ body {
 .btn-edit { background: #3498db; }
 .btn-delete { background: #e74c3c; }
 .btn-add { background: #2ecc71; }
+
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-    <h2>HotelLux</h2>
-
-    <a href="/hotel-booking/admin/dashboard.php">🏠 Dashboard</a>
-    <a href="/hotel-booking/admin/modules/rooms/list.php">🏨 Rooms</a>
-    <a href="/hotel-booking/admin/modules/bookings/list.php">📅 Bookings</a>
-    <a href="/hotel-booking/admin/modules/users/list.php">👤 Users</a>
-</div>
+<!-- ✅ USE SIDEBAR FROM sidebar.php -->
+<?php include(__DIR__ . "/sidebar.php"); ?>
 
 <!-- MAIN CONTENT START -->
 <div class="main">

@@ -6,33 +6,35 @@ function isActive($keyword) {
 
 <div class="sidebar">
 
-    <h2 class="logo">HotelLux</h2>
+    <div>
+        <h2 class="logo">HotelLux</h2>
 
-    <div class="nav-menu">
+        <div class="nav-menu">
 
-        <a href="/hotel-booking/admin/dashboard.php"
-           class="nav-link <?= isActive('dashboard.php') ?>">
-           🏠 Dashboard
-        </a>
+            <a href="/hotel-booking/admin/dashboard.php"
+               class="nav-link <?= isActive('dashboard.php') ?>">
+               🏠 Dashboard
+            </a>
 
-        <a href="/hotel-booking/admin/modules/rooms/list.php"
-           class="nav-link <?= isActive('/rooms/') ?>">
-           🏨 Rooms
-        </a>
+            <a href="/hotel-booking/admin/modules/rooms/list.php"
+               class="nav-link <?= isActive('/rooms/') ?>">
+               🏨 Rooms
+            </a>
 
-        <a href="/hotel-booking/admin/modules/bookings/list.php"
-           class="nav-link <?= isActive('/bookings/') ?>">
-           📅 Bookings
-        </a>
+            <a href="/hotel-booking/admin/modules/bookings/list.php"
+               class="nav-link <?= isActive('/bookings/') ?>">
+               📅 Bookings
+            </a>
 
-        <a href="/hotel-booking/admin/modules/users/list.php"
-           class="nav-link <?= isActive('/users/') ?>">
-           👤 Users
-        </a>
+            <a href="/hotel-booking/admin/modules/users/list.php"
+               class="nav-link <?= isActive('/users/') ?>">
+               👤 Users
+            </a>
 
+        </div>
     </div>
 
-    <!-- ✅ SINGLE LOGOUT BUTTON -->
+    <!-- 🔥 LOGOUT BUTTON -->
     <a href="/hotel-booking/admin/logout.php"
        class="nav-link logout-btn"
        onclick="return confirm('Are you sure you want to logout?')">
@@ -48,9 +50,13 @@ function isActive($keyword) {
     background: linear-gradient(180deg, #1e293b, #0f172a);
     color: white;
     position: fixed;
+    left: 0;
+    top: 0;
     padding: 25px 15px;
+
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 }
 
 /* LOGO */
@@ -61,7 +67,7 @@ function isActive($keyword) {
     text-align: center;
 }
 
-/* MENU WRAPPER */
+/* MENU */
 .nav-menu {
     display: flex;
     flex-direction: column;
@@ -89,9 +95,9 @@ function isActive($keyword) {
     font-weight: 600;
 }
 
-/* 🔥 LOGOUT (BOTTOM FIXED) */
+/* LOGOUT */
 .logout-btn {
-    margin-top: auto; /* pushes it to bottom */
+    margin-top: auto;
     background: rgba(255,255,255,0.1);
     color: #ff6b6b;
     text-align: center;

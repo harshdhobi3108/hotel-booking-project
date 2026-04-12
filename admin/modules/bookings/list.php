@@ -6,8 +6,11 @@ require_once("../../includes/db.php");
 $statusFilter = $_GET['status'] ?? '';
 
 $where = "";
-if ($statusFilter) {
-    $where = "WHERE o.status = '$statusFilter'";
+if (!empty($statusFilter)) {
+    $allowed = ['pending', 'confirmed', 'failed'];
+    if (in_array($statusFilter, $allowed)) {
+        $where = "WHERE o.status = '$statusFilter'";
+    }
 }
 
 /* ===== QUERY ===== */
@@ -92,34 +95,31 @@ if (!$result) {
 }
 
 .badge.confirmed {
-    background: #d4edda;
-    color: #155724;
+    background: #d1fae5;
+    color: #065f46;
 }
 
-.badge.cancelled {
-    background: #f8d7da;
-    color: #721c24;
+.badge.pending {
+    background: #fef3c7;
+    color: #92400e;
 }
 
-/* ===== BUTTONS ===== */
+.badge.failed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ===== BUTTON ===== */
 .btn {
     padding: 6px 12px;
     border-radius: 6px;
     text-decoration: none;
     font-size: 13px;
     color: white;
-    margin-right: 5px;
 }
 
-.btn-confirm { background: #28a745; }
-.btn-cancel { background: #dc3545; }
-
-/* ===== RESPONSIVE ===== */
-@media(max-width: 768px) {
-    .table th, .table td {
-        font-size: 12px;
-        padding: 10px;
-    }
+.btn-cancel {
+    background: #dc3545;
 }
 
 </style>
@@ -133,7 +133,8 @@ if (!$result) {
             <select name="status" onchange="this.form.submit()">
                 <option value="">All</option>
                 <option value="confirmed" <?= $statusFilter=='confirmed'?'selected':'' ?>>Confirmed</option>
-                <option value="cancelled" <?= $statusFilter=='cancelled'?'selected':'' ?>>Cancelled</option>
+                <option value="pending" <?= $statusFilter=='pending'?'selected':'' ?>>Pending</option>
+                <option value="failed" <?= $statusFilter=='failed'?'selected':'' ?>>Failed</option>
             </select>
         </form>
     </div>
@@ -142,62 +143,64 @@ if (!$result) {
 <!-- ===== TABLE ===== -->
 <div class="card">
 
-    <table class="table">
-        <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Email</th>
-            <th>Room</th>
-            <th>Check In</th>
-            <th>Check Out</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
+<table class="table">
+<tr>
+    <th>ID</th>
+    <th>User</th>
+    <th>Email</th>
+    <th>Room</th>
+    <th>Check In</th>
+    <th>Check Out</th>
+    <th>Amount</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
 
-        <?php while($row = $result->fetch_assoc()): ?>
-        <tr>
+<?php while($row = $result->fetch_assoc()): ?>
+<tr>
 
-            <td><?= $row['id'] ?></td>
+    <td><?= $row['id'] ?></td>
 
-            <td><?= htmlspecialchars($row['user_name']) ?></td>
+    <td><?= htmlspecialchars($row['user_name']) ?></td>
 
-            <td><?= htmlspecialchars($row['email']) ?></td>
+    <td><?= htmlspecialchars($row['email']) ?></td>
 
-            <td><?= htmlspecialchars($row['room_name']) ?></td>
+    <td><?= htmlspecialchars($row['room_name']) ?></td>
 
-            <td><?= $row['booking_date'] ?></td>
+    <td><?= $row['booking_date'] ?></td>
 
-            <td><?= $row['check_out'] ?></td>
+    <td><?= $row['check_out'] ?></td>
 
-            <td>₹<?= number_format($row['amount']) ?></td>
+    <td>₹<?= number_format($row['amount']) ?></td>
 
-            <td>
-                <span class="badge <?= $row['status'] ?>">
-                    <?= ucfirst($row['status']) ?>
-                </span>
-            </td>
+    <!-- STATUS -->
+    <td>
+        <?php if ($row['status'] == 'confirmed'): ?>
+            <span class="badge confirmed">Confirmed</span>
+        <?php elseif ($row['status'] == 'pending'): ?>
+            <span class="badge pending">Pending Payment</span>
+        <?php else: ?>
+            <span class="badge failed">Failed</span>
+        <?php endif; ?>
+    </td>
 
-            <td>
-                <?php if ($row['status'] !== 'confirmed'): ?>
-                    <a href="update_status.php?id=<?= $row['id'] ?>&status=confirmed"
-                       class="btn btn-confirm">
-                       Confirm
-                    </a>
-                <?php endif; ?>
+    <!-- ACTION -->
+    <td>
+        <?php if ($row['status'] == 'confirmed'): ?>
+            <a href="cancel.php?id=<?= $row['id'] ?>"
+               class="btn btn-cancel"
+               onclick="return confirm('Cancel this booking?')">
+               Cancel
+            </a>
+        <?php else: ?>
+            <span style="color:#999;">—</span>
+        <?php endif; ?>
+    </td>
 
-                <?php if ($row['status'] !== 'cancelled'): ?>
-                    <a href="update_status.php?id=<?= $row['id'] ?>&status=cancelled"
-                       class="btn btn-cancel">
-                       Cancel
-                    </a>
-                <?php endif; ?>
-            </td>
+</tr>
+<?php endwhile; ?>
 
-        </tr>
-        <?php endwhile; ?>
-
-    </table>
+</table>
 
 </div>
 

@@ -5,40 +5,52 @@ require __DIR__ . '/includes/config.php';
 use Razorpay\Api\Api;
 use Razorpay\Api\Errors\SignatureVerificationError;
 
+// ================= FIX JSON ERROR =================
 header('Content-Type: application/json');
+error_reporting(0);
+ini_set('display_errors', 0);
 
-// ===============================
-// ✅ SESSION
-// ===============================
+// ================= SESSION =================
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// ===============================
-// 🔐 AUTH CHECK
-// ===============================
+// ================= AUTH =================
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(["status" => "error", "message" => "Unauthorized"]);
     exit;
 }
 
-// ===============================
-// ✅ GET DATA
-// ===============================
+// ================= INPUT =================
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (
-    empty($data['razorpay_order_id']) ||
-    empty($data['razorpay_payment_id']) ||
-    empty($data['razorpay_signature'])
-) {
-    echo json_encode(["status" => "error", "message" => "Missing payment data"]);
+if (empty($data['razorpay_order_id'])) {
+    echo json_encode(["status" => "error", "message" => "Order ID missing"]);
     exit;
 }
 
-// ===============================
-// ✅ SESSION BOOKING CHECK
-// ===============================
+// ================= FAILED / CANCELLED PAYMENT =================
+if (empty($data['razorpay_payment_id'])) {
+
+    $stmt = $conn->prepare("
+        UPDATE orders 
+        SET status = 'failed' 
+        WHERE razorpay_order_id = ?
+    ");
+    $stmt->bind_param("s", $data['razorpay_order_id']);
+    $stmt->execute();
+
+    // 🔥 IMPORTANT
+    unset($_SESSION['booking']);
+
+    echo json_encode([
+        "status" => "failed",
+        "message" => "Payment failed or cancelled"
+    ]);
+    exit;
+}
+
+// ================= SESSION BOOKING =================
 if (!isset($_SESSION['booking'])) {
     echo json_encode(["status" => "error", "message" => "Session expired"]);
     exit;
@@ -51,84 +63,69 @@ if ($booking['razorpay_order_id'] !== $data['razorpay_order_id']) {
     exit;
 }
 
-// ===============================
-// ✅ INIT RAZORPAY
-// ===============================
+// ================= RAZORPAY =================
 $api = new Api($razorpay['key_id'], $razorpay['secret']);
 
 try {
 
-    // ===============================
-    // 🔐 VERIFY SIGNATURE
-    // ===============================
+    // ================= START TRANSACTION =================
+    $conn->begin_transaction();
+
+    // ================= SIGNATURE CHECK =================
+    if (empty($data['razorpay_signature'])) {
+        throw new Exception("Signature missing");
+    }
+
     $api->utility->verifyPaymentSignature([
         'razorpay_order_id'   => $data['razorpay_order_id'],
         'razorpay_payment_id' => $data['razorpay_payment_id'],
         'razorpay_signature'  => $data['razorpay_signature']
     ]);
 
-    // ===============================
-    // 🔥 FETCH PAYMENT
-    // ===============================
+    // ================= FETCH PAYMENT =================
     $payment = $api->payment->fetch($data['razorpay_payment_id']);
 
     if ($payment->status !== 'captured') {
         throw new Exception("Payment not captured");
     }
 
-    // ===============================
-    // ✅ EXTRACT DATA
-    // ===============================
+    // ================= DATA =================
     $user_id   = $booking['user_id'];
     $room_id   = $booking['room_id'];
     $check_in  = $booking['check_in'];
     $check_out = $booking['check_out'];
-    $time      = $booking['time'];
     $amount    = $booking['amount'];
 
-    // ===============================
-    // 🔥 VALIDATE DATES
-    // ===============================
+    // ================= VALIDATION =================
     if ($check_out <= $check_in) {
         throw new Exception("Invalid booking dates");
     }
 
-    // ===============================
-    // 🔥 AMOUNT VALIDATION
-    // ===============================
     if ($payment->amount != ($amount * 100)) {
         throw new Exception("Amount mismatch");
     }
 
-    // ===============================
-    // 🔥 FINAL DOUBLE BOOKING CHECK (STRONG LOGIC)
-    // ===============================
+    // ================= 🔥 FINAL DOUBLE BOOKING CHECK (FIXED) =================
     $check = $conn->prepare("
         SELECT id FROM orders 
         WHERE room_id = ?
         AND status = 'confirmed'
-        AND NOT (
-            check_out <= ?
-            OR booking_date >= ?
+        AND payment_id IS NOT NULL
+        AND (
+            booking_date < ? 
+            AND check_out > ?
         )
+        LIMIT 1
     ");
 
-    $check->bind_param("iss", $room_id, $check_in, $check_out);
+    $check->bind_param("iss", $room_id, $check_out, $check_in);
     $check->execute();
-    $result = $check->get_result();
 
-    if ($result->num_rows > 0) {
+    if ($check->get_result()->num_rows > 0) {
         throw new Exception("Room already booked for selected dates");
     }
 
-    // ===============================
-    // 🔐 START TRANSACTION
-    // ===============================
-    $conn->begin_transaction();
-
-    // ===============================
-    // ✅ INSERT PAYMENT
-    // ===============================
+    // ================= INSERT PAYMENT =================
     $stmt = $conn->prepare("
         INSERT INTO payments 
         (user_id, room_id, amount, payment_id, order_id, status)
@@ -148,9 +145,7 @@ try {
         throw new Exception("Payment insert failed");
     }
 
-    // ===============================
-    // ✅ UPDATE ORDER (CONFIRM BOOKING)
-    // ===============================
+    // ================= UPDATE ORDER =================
     $stmt2 = $conn->prepare("
         UPDATE orders 
         SET status = 'confirmed',
@@ -168,9 +163,7 @@ try {
         throw new Exception("Order update failed");
     }
 
-    // ===============================
-    // ✅ COMMIT
-    // ===============================
+    // ================= COMMIT =================
     $conn->commit();
 
     unset($_SESSION['booking']);
@@ -186,9 +179,10 @@ try {
         SET status = 'failed' 
         WHERE razorpay_order_id = ?
     ");
-
     $stmt->bind_param("s", $data['razorpay_order_id']);
     $stmt->execute();
+
+    unset($_SESSION['booking']);
 
     echo json_encode([
         "status" => "error",
@@ -198,6 +192,16 @@ try {
 } catch (Exception $e) {
 
     $conn->rollback();
+
+    $stmt = $conn->prepare("
+        UPDATE orders 
+        SET status = 'failed' 
+        WHERE razorpay_order_id = ?
+    ");
+    $stmt->bind_param("s", $data['razorpay_order_id']);
+    $stmt->execute();
+
+    unset($_SESSION['booking']);
 
     echo json_encode([
         "status" => "error",

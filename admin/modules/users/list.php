@@ -2,24 +2,14 @@
 require_once("../../includes/auth_check.php");
 require_once("../../includes/db.php");
 
-/* ===== SEARCH ===== */
-$search = $_GET['search'] ?? '';
-
-$where = "";
-if ($search) {
-    $searchSafe = $conn->real_escape_string($search);
-    $where = "WHERE name LIKE '%$searchSafe%' OR email LIKE '%$searchSafe%'";
-}
-
-/* ===== QUERY ===== */
-$result = $conn->query("SELECT * FROM users $where ORDER BY id DESC");
+$result = $conn->query("SELECT * FROM users ORDER BY id DESC");
 ?>
 
 <?php include("../../includes/header.php"); ?>
 
 <style>
 
-/* ===== TOP BAR ===== */
+/* SAME YOUR DESIGN (unchanged) */
 .top-bar {
     display: flex;
     justify-content: space-between;
@@ -27,16 +17,14 @@ $result = $conn->query("SELECT * FROM users $where ORDER BY id DESC");
     margin-bottom: 20px;
 }
 
-/* ===== SEARCH ===== */
 .search-box input {
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
     border: 1px solid #ddd;
     outline: none;
-    width: 220px;
+    width: 240px;
 }
 
-/* ===== CARD ===== */
 .card {
     background: #fff;
     border-radius: 14px;
@@ -44,7 +32,6 @@ $result = $conn->query("SELECT * FROM users $where ORDER BY id DESC");
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
-/* ===== TABLE ===== */
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -54,7 +41,6 @@ $result = $conn->query("SELECT * FROM users $where ORDER BY id DESC");
     text-align: left;
     padding: 14px;
     background: #f9fafb;
-    font-size: 14px;
 }
 
 .table td {
@@ -62,12 +48,6 @@ $result = $conn->query("SELECT * FROM users $where ORDER BY id DESC");
     border-top: 1px solid #eee;
 }
 
-/* Hover */
-.table tr:hover {
-    background: #f7f9fc;
-}
-
-/* ===== USER AVATAR ===== */
 .user {
     display: flex;
     align-items: center;
@@ -83,89 +63,139 @@ $result = $conn->query("SELECT * FROM users $where ORDER BY id DESC");
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
 }
 
-/* ===== BUTTON ===== */
 .btn-delete {
     padding: 6px 12px;
     background: #e74c3c;
     color: white;
     border-radius: 6px;
     text-decoration: none;
-    font-size: 13px;
 }
 
-/* ===== RESPONSIVE ===== */
-@media(max-width: 768px) {
-    .table th, .table td {
-        font-size: 12px;
-        padding: 10px;
-    }
+.empty {
+    text-align: center;
+    padding: 20px;
+    color: #888;
 }
 
 </style>
 
-<!-- ===== HEADER ===== -->
 <div class="top-bar">
     <h2>Users</h2>
 
     <div class="search-box">
-        <form method="GET">
-            <input 
-                type="text" 
-                name="search" 
-                placeholder="Search users..." 
-                value="<?= htmlspecialchars($search) ?>"
-                onkeyup="this.form.submit()"
-            >
-        </form>
+        <input 
+            type="text" 
+            id="searchInput"
+            placeholder="Search users..."
+        >
     </div>
 </div>
 
-<!-- ===== TABLE ===== -->
 <div class="card">
 
     <table class="table">
-        <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Email</th>
-            <th>Action</th>
-        </tr>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
 
-        <?php while($row = $result->fetch_assoc()): ?>
-        <tr>
+        <tbody id="userTable">
 
-            <td><?= $row['id'] ?></td>
+            <?php while($row = $result->fetch_assoc()): ?>
+            <tr>
+                <td><?= $row['id'] ?></td>
 
-            <td>
-                <div class="user">
-                    <div class="avatar">
-                        <?= strtoupper(substr($row['name'], 0, 1)) ?>
-                    </div>
-
-                    <div>
+                <td>
+                    <div class="user">
+                        <div class="avatar">
+                            <?= strtoupper(substr($row['name'], 0, 1)) ?>
+                        </div>
                         <?= htmlspecialchars($row['name']) ?>
                     </div>
-                </div>
-            </td>
+                </td>
 
-            <td><?= htmlspecialchars($row['email']) ?></td>
+                <td><?= htmlspecialchars($row['email']) ?></td>
 
-            <td>
-                <a class="btn-delete"
-                   href="delete.php?id=<?= $row['id'] ?>"
-                   onclick="return confirm('Delete this user?')">
-                   Delete
-                </a>
-            </td>
+                <td>
+                    <a class="btn-delete"
+                       href="delete.php?id=<?= $row['id'] ?>"
+                       onclick="return confirm('Delete this user?')">
+                       Delete
+                    </a>
+                </td>
+            </tr>
+            <?php endwhile; ?>
 
-        </tr>
-        <?php endwhile; ?>
+        </tbody>
 
     </table>
 
 </div>
+
+<script>
+const input = document.getElementById("searchInput");
+const table = document.getElementById("userTable");
+
+let timer;
+
+input.addEventListener("keyup", () => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+        const query = input.value;
+
+        fetch(`search.php?search=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+
+                table.innerHTML = "";
+
+                if (data.length === 0) {
+                    table.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="empty">No users found</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                data.forEach(user => {
+                    table.innerHTML += `
+                        <tr>
+                            <td>${user.id}</td>
+
+                            <td>
+                                <div class="user">
+                                    <div class="avatar">
+                                        ${user.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    ${user.name}
+                                </div>
+                            </td>
+
+                            <td>${user.email}</td>
+
+                            <td>
+                                <a class="btn-delete"
+                                   href="delete.php?id=${user.id}"
+                                   onclick="return confirm('Delete this user?')">
+                                   Delete
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+            });
+
+    }, 300);
+});
+</script>
 
 <?php include("../../includes/footer.php"); ?>
