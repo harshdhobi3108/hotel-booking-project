@@ -47,7 +47,6 @@ include("includes/header.php");
             margin: 0;
         }
 
-        /* ===== LAYOUT ===== */
         .booking-container {
             display: grid;
             grid-template-columns: 1.2fr 1fr;
@@ -55,7 +54,6 @@ include("includes/header.php");
             padding: 60px;
         }
 
-        /* ===== LEFT CARD ===== */
         .room-preview {
             background: white;
             border-radius: 20px;
@@ -100,7 +98,6 @@ include("includes/header.php");
             color: gray;
         }
 
-        /* ===== RIGHT CARD ===== */
         .booking-card {
             background: rgba(255,255,255,0.75);
             backdrop-filter: blur(12px);
@@ -115,7 +112,6 @@ include("includes/header.php");
             margin-bottom: 20px;
         }
 
-        /* ===== FORM ===== */
         .input-group {
             margin-bottom: 15px;
             display: flex;
@@ -146,7 +142,6 @@ include("includes/header.php");
             gap: 10px;
         }
 
-        /* ===== BUTTON ===== */
         .pay-btn {
             width: 100%;
             margin-top: 20px;
@@ -165,7 +160,6 @@ include("includes/header.php");
             box-shadow: 0 8px 20px rgba(123,44,191,0.3);
         }
 
-        /* ===== SUCCESS ===== */
         .success-box {
             background: #d4edda;
             color: #155724;
@@ -174,10 +168,8 @@ include("includes/header.php");
             border-radius: 10px;
             font-weight: bold;
         }
-        
-        /* ================= MOBILE RESPONSIVE ================= */
-        @media (max-width: 768px) {
 
+        @media (max-width: 768px) {
             .booking-container {
                 grid-template-columns: 1fr;
                 padding: 20px;
@@ -189,7 +181,7 @@ include("includes/header.php");
             }
 
             .booking-card {
-                position: static; /* remove sticky */
+                position: static;
                 padding: 20px;
             }
 
@@ -232,72 +224,73 @@ if (isset($_GET['success']) && isset($_SESSION['user_email'])) {
 
 <div class="booking-container">
 
-    <!-- LEFT: ROOM -->
+    <!-- LEFT -->
     <div class="room-preview">
-        <img src="/hotel-booking/assets/images/<?php echo $room['image']; ?>">
+
+        <!-- ✅ FIXED IMAGE -->
+        <img src="/hotel-booking/<?php echo htmlspecialchars($room['image']); ?>" alt="room">
 
         <div class="room-details">
-            <h2><?php echo $room['name']; ?></h2>
+            <h2><?php echo htmlspecialchars($room['name']); ?></h2>
 
             <p class="location">HotelLux, Ahmedabad</p>
             <p class="features">WiFi • AC • Breakfast</p>
 
             <div class="price-box">
-                ₹<?php echo $room['price']; ?> <span>/ night</span>
+                ₹<?php echo htmlspecialchars($room['price']); ?> <span>/ night</span>
             </div>
         </div>
     </div>
 
-    <!-- RIGHT: FORM -->
+    <!-- RIGHT -->
     <div class="booking-card">
 
         <h2>Complete Your Booking</h2>
 
         <form id="bookingForm">
 
-    <input type="hidden" name="room_id" value="<?php echo $room['id']; ?>">
-    <input type="hidden" name="amount" value="<?php echo $room['price']; ?>">
+            <input type="hidden" name="room_id" value="<?php echo $room['id']; ?>">
+            <input type="hidden" name="amount" value="<?php echo $room['price']; ?>">
 
-    <div class="input-group">
-        <label>Full Name</label>
-        <input type="text" value="<?php echo $_SESSION['user_name']; ?>" readonly>
-    </div>
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" value="<?php echo $_SESSION['user_name']; ?>" readonly>
+            </div>
 
-    <div class="input-group">
-        <label>Email</label>
-        <input type="email" value="<?php echo $_SESSION['user_email']; ?>" readonly>
-    </div>
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" value="<?php echo $_SESSION['user_email']; ?>" readonly>
+            </div>
 
-    <div class="input-row">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Check-in</label>
+                    <input type="date" name="check_in" required>
+                </div>
 
-        <div class="input-group">
-            <label>Check-in</label>
-            <input type="date" name="check_in" id="check_in" required>
-        </div>
+                <div class="input-group">
+                    <label>Check-out</label>
+                    <input type="date" name="check_out" required>
+                </div>
+            </div>
 
-        <div class="input-group">
-            <label>Check-out</label>
-            <input type="date" name="check_out" id="check_out" required>
-        </div>
+            <div class="input-group">
+                <label>Time</label>
+                <select name="time" required>
+                    <option value="">Select Time</option>
+                    <option>10:00 AM</option>
+                    <option>12:00 PM</option>
+                    <option>2:00 PM</option>
+                    <option>4:00 PM</option>
+                </select>
+            </div>
 
-    </div>
+            <button class="pay-btn" type="submit">
+                Proceed to Payment →
+            </button>
 
-    <div class="input-group">
-        <label>Time</label>
-        <select name="time" required>
-            <option value="">Select Time</option>
-            <option>10:00 AM</option>
-            <option>12:00 PM</option>
-            <option>2:00 PM</option>
-            <option>4:00 PM</option>
-        </select>
-    </div>
+        </form>
 
-    <button class="pay-btn" type="submit">
-        Proceed to Payment →
-    </button>
-
-</form>
     </div>
 
 </div>

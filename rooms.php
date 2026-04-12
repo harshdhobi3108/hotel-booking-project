@@ -73,18 +73,18 @@ include("includes/header.php");
             font-weight: bold;
         }
 
-       .content {
-          padding: 15px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-      }
+        .content {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-      .bottom-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-      }
+        .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
         .title {
             font-size: 18px;
@@ -137,7 +137,7 @@ include("includes/header.php");
         <?php while ($room = $result->fetch_assoc()): ?>
 
             <?php
-            // ✅ FIXED QUERY (booking_date instead of date)
+            // ================= BOOKING CHECK =================
             $check = $conn->prepare("
                 SELECT id FROM orders 
                 WHERE room_id = ? 
@@ -147,13 +147,29 @@ include("includes/header.php");
             $check->bind_param("i", $room['id']);
             $check->execute();
             $isBooked = $check->get_result()->num_rows > 0;
+
+            // ================= IMAGE FIX =================
+            $imageName = $room['image'];
+
+            // Absolute paths (for checking)
+            $uploadPath = __DIR__ . "/uploads/rooms/" . $imageName;
+            $assetPath  = __DIR__ . "/assets/images/" . $imageName;
+
+            // Web paths (for browser)
+            if (file_exists($uploadPath)) {
+                $finalImage = "uploads/rooms/" . $imageName;
+            } elseif (file_exists($assetPath)) {
+                $finalImage = "assets/images/" . $imageName;
+            } else {
+                $finalImage = "assets/images/default.jpg";
+            }
             ?>
 
             <div class="card">
 
                 <div class="hot">HOT DEAL</div>
 
-                <img src="/hotel-booking/assets/images/<?php echo $room['image']; ?>" alt="room">
+                <img src="/hotel-booking/<?php echo htmlspecialchars($room['image']); ?>" alt="room">
 
                 <?php if ($isBooked): ?>
                     <div class="overlay">BOOKED</div>
@@ -161,8 +177,8 @@ include("includes/header.php");
 
                 <div class="content">
                     <div class="title">
-                        <?php echo $room['name']; ?>
-                        <span class="rating">⭐ <?php echo $room['rating']; ?></span>
+                        <?php echo htmlspecialchars($room['name']); ?>
+                        <span class="rating">⭐ <?php echo htmlspecialchars($room['rating']); ?></span>
                     </div>
 
                     <div class="info">
@@ -171,27 +187,24 @@ include("includes/header.php");
                     </div>
 
                     <div class="bottom-row">
-                        <div class="price">₹<?php echo $room['price']; ?></div>
+                        <div class="price">₹<?php echo htmlspecialchars($room['price']); ?></div>
 
                         <?php if ($isBooked): ?>
-    <a class="btn disabled">Booked</a>
+                            <a class="btn disabled">Booked</a>
 
-<?php else: ?>
+                        <?php else: ?>
 
-    <?php if (isset($_SESSION['user_email'])): ?>
-        <!-- ✅ Logged in user -->
-        <a href="booking.php?room_id=<?php echo $room['id']; ?>" class="btn">
-            Book Now
-        </a>
+                            <?php if (isset($_SESSION['user_email'])): ?>
+                                <a href="booking.php?room_id=<?php echo $room['id']; ?>" class="btn">
+                                    Book Now
+                                </a>
+                            <?php else: ?>
+                                <a href="/hotel-booking/auth/login.php" class="btn">
+                                    Login to Book
+                                </a>
+                            <?php endif; ?>
 
-    <?php else: ?>
-        <!-- ❌ Not logged in -->
-        <a href="/hotel-booking/auth/login.php" class="btn">
-            Login to Book
-        </a>
-    <?php endif; ?>
-
-<?php endif; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
 

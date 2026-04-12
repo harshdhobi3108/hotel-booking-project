@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['admin_email'] = $admin['email'];
                 $_SESSION['admin_name']  = $admin['name'];
 
-                header("Location: /hotel-booking/admin/modules/rooms/list.php");
+                header("Location: /hotel-booking/admin/dashboard.php");
                 exit();
             } else {
                 $error = "Incorrect password!";

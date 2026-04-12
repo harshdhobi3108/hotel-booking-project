@@ -1,28 +1,77 @@
 <?php
 require_once '../../includes/db.php';
 require_once '../../includes/auth_check.php';
-?>
 
-<?php
+// ================= HANDLE FORM =================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  $name = $_POST['name'];
-  $price = $_POST['price'];
-  $image = $_POST['image'];
-  $rating = $_POST['rating'];
-  $location = $_POST['location'];
-  $features = $_POST['features'];
+    // ================= INPUT =================
+    $name     = trim($_POST['name']);
+    $price    = $_POST['price'];
+    $rating   = $_POST['rating'];
+    $location = $_POST['location'];
+    $features = $_POST['features'];
 
-  // Secure insert
-  $stmt = $conn->prepare("INSERT INTO rooms 
-    (name, price, image, rating, location, features, status) 
-    VALUES (?, ?, ?, ?, ?, ?, 'available')");
+    // ================= IMAGE UPLOAD =================
+    if (!isset($_FILES['image']) || $_FILES['image']['error'] !== 0) {
+        die("Image upload is required.");
+    }
 
-  $stmt->bind_param("sdssss", $name, $price, $image, $rating, $location, $features);
-  $stmt->execute();
+    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/hotel-booking/uploads/rooms/';
 
-  header("Location: list.php");
-  exit();
+    // Ensure folder exists
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $originalName = $_FILES['image']['name'];
+    $tmpName      = $_FILES['image']['tmp_name'];
+    $fileSize     = $_FILES['image']['size'];
+
+    // ================= VALIDATION =================
+    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+    $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+
+    if (!in_array($ext, $allowed)) {
+        die("Only JPG, JPEG, PNG, WEBP files allowed.");
+    }
+
+    if ($fileSize > 5 * 1024 * 1024) { // 5MB
+        die("File size must be less than 5MB.");
+    }
+
+    // ================= SAFE FILE NAME =================
+    $baseName = strtolower(pathinfo($originalName, PATHINFO_FILENAME));
+
+    // Clean filename (remove special chars)
+    $baseName = preg_replace('/[^a-z0-9-]/', '-', $baseName);
+    $baseName = preg_replace('/-+/', '-', $baseName);
+
+    // Unique + readable filename (BEST PRACTICE)
+    $imageName = $baseName . '.' . $ext;
+
+    $destination = $uploadDir . $imageName;
+
+    // ================= MOVE FILE =================
+    if (!move_uploaded_file($tmpName, $destination)) {
+        die("Failed to upload image.");
+    }
+
+    // ================= SAVE PATH =================
+    $imagePath = "uploads/rooms/" . $imageName;
+
+    // ================= INSERT INTO DB =================
+    $stmt = $conn->prepare("
+        INSERT INTO rooms 
+        (name, price, image, rating, location, features, status) 
+        VALUES (?, ?, ?, ?, ?, ?, 'available')
+    ");
+
+    $stmt->bind_param("sdssss", $name, $price, $imagePath, $rating, $location, $features);
+    $stmt->execute();
+
+    header("Location: list.php");
+    exit();
 }
 ?>
 
@@ -38,18 +87,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       background: #f4f6f9;
     }
 
-    /* LAYOUT */
     .container {
       display: flex;
     }
 
-    /* MAIN */
     .main {
       flex: 1;
       padding: 40px;
     }
 
-    /* HEADER */
     .page-header {
       margin-bottom: 25px;
     }
@@ -60,13 +106,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       color: #333;
     }
 
-    /* CENTER */
     .form-wrapper {
       display: flex;
       justify-content: center;
     }
 
-    /* CARD */
     .card {
       width: 100%;
       max-width: 600px;
@@ -76,7 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
 
-    /* FORM */
     .form-group {
       margin-bottom: 18px;
     }
@@ -95,7 +138,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       border-radius: 8px;
       outline: none;
       font-size: 14px;
-      transition: 0.3s;
     }
 
     input:focus {
@@ -103,7 +145,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       box-shadow: 0 0 0 2px rgba(108,92,231,0.1);
     }
 
-    /* BUTTON */
     .btn {
       width: 100%;
       padding: 14px;
@@ -113,14 +154,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       font-weight: 600;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s;
     }
 
     .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(108,92,231,0.2);
     }
-
   </style>
 </head>
 
@@ -128,10 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="container">
 
-  <!-- SIDEBAR -->
   <?php include '../../includes/sidebar.php'; ?>
 
-  <!-- MAIN CONTENT -->
   <div class="main">
 
     <div class="page-header">
@@ -141,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="form-wrapper">
       <div class="card">
 
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
 
           <div class="form-group">
             <label>Room Name</label>
@@ -154,8 +191,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
 
           <div class="form-group">
-            <label>Image Filename</label>
-            <input type="text" name="image" placeholder="room1.jpg" required>
+            <label>Upload Image</label>
+            <input type="file" name="image" accept="image/*" required>
           </div>
 
           <div class="form-group">

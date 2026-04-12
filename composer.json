@@ -3,6 +3,7 @@
         "google/apiclient": "*",
         "razorpay/razorpay": "^2.9",
         "vlucas/phpdotenv": "^5.6",
-        "dompdf/dompdf": "^3.1"
+        "dompdf/dompdf": "^3.1",
+        "phpmailer/phpmailer": "^7.0"
     }
 }

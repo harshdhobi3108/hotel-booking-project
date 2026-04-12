@@ -2,150 +2,170 @@
 require_once("../../includes/auth_check.php");
 require_once("../../includes/db.php");
 
-$result = $conn->query("SELECT * FROM users");
+/* ===== SEARCH ===== */
+$search = $_GET['search'] ?? '';
+
+$where = "";
+if ($search) {
+    $searchSafe = $conn->real_escape_string($search);
+    $where = "WHERE name LIKE '%$searchSafe%' OR email LIKE '%$searchSafe%'";
+}
+
+/* ===== QUERY ===== */
+$result = $conn->query("SELECT * FROM users $where ORDER BY id DESC");
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Users</title>
+<?php include("../../includes/header.php"); ?>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background: #f4f6f9;
-        }
+<style>
 
-        /* MAIN */
-        .main {
-            margin-left: 240px;
-            padding: 40px;
-        }
+/* ===== TOP BAR ===== */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
-        /* HEADER */
-        .page-header {
-            margin-bottom: 25px;
-        }
+/* ===== SEARCH ===== */
+.search-box input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    width: 220px;
+}
 
-        .page-header h1 {
-            margin: 0;
-            font-size: 26px;
-            color: #333;
-        }
+/* ===== CARD ===== */
+.card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
 
-        /* CENTER WRAPPER */
-        .center-box {
-            display: flex;
-            justify-content: center;
-        }
+/* ===== TABLE ===== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        /* CARD */
-        .card {
-            width: 100%;
-            max-width: 900px; /* CONTROL WIDTH HERE */
-            background: #fff;
-            padding: 25px;
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        }
+.table th {
+    text-align: left;
+    padding: 14px;
+    background: #f9fafb;
+    font-size: 14px;
+}
 
-        /* TABLE */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+.table td {
+    padding: 14px;
+    border-top: 1px solid #eee;
+}
 
-        thead {
-            background: #f1f3f6;
-        }
+/* Hover */
+.table tr:hover {
+    background: #f7f9fc;
+}
 
-        th, td {
-            padding: 14px;
-            text-align: left;
-        }
+/* ===== USER AVATAR ===== */
+.user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-        th {
-            font-size: 14px;
-            color: #555;
-        }
+.avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
 
-        td {
-            font-size: 14px;
-            color: #333;
-        }
+/* ===== BUTTON ===== */
+.btn-delete {
+    padding: 6px 12px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+}
 
-        tr {
-            border-bottom: 1px solid #eee;
-        }
+/* ===== RESPONSIVE ===== */
+@media(max-width: 768px) {
+    .table th, .table td {
+        font-size: 12px;
+        padding: 10px;
+    }
+}
 
-        tr:hover {
-            background: #f9f9ff;
-        }
+</style>
 
-        /* DELETE BUTTON */
-        .btn-delete {
-            padding: 6px 14px;
-            background: #ff4757;
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 13px;
-            transition: 0.3s;
-        }
+<!-- ===== HEADER ===== -->
+<div class="top-bar">
+    <h2>Users</h2>
 
-        .btn-delete:hover {
-            background: #e84118;
-        }
-
-    </style>
-</head>
-
-<body>
-
-<?php include("../../includes/sidebar.php"); ?>
-
-<div class="main">
-
-    <div class="page-header">
-        <h1>Users</h1>
+    <div class="search-box">
+        <form method="GET">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search users..." 
+                value="<?= htmlspecialchars($search) ?>"
+                onkeyup="this.form.submit()"
+            >
+        </form>
     </div>
+</div>
 
-    <div class="center-box">
-        <div class="card">
+<!-- ===== TABLE ===== -->
+<div class="card">
 
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width:80px;">ID</th>
-                        <th style="width:200px;">Name</th>
-                        <th>Email</th>
-                        <th style="width:120px;">Action</th>
-                    </tr>
-                </thead>
+    <table class="table">
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
 
-                <tbody>
-                    <?php while($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= $row['id'] ?></td>
-                        <td><?= htmlspecialchars($row['name']) ?></td>
-                        <td><?= htmlspecialchars($row['email']) ?></td>
-                        <td>
-                            <a class="btn-delete"
-                               href="delete.php?id=<?= $row['id'] ?>"
-                               onclick="return confirm('Delete this user?')">
-                               Delete
-                            </a>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+        <?php while($row = $result->fetch_assoc()): ?>
+        <tr>
 
-        </div>
-    </div>
+            <td><?= $row['id'] ?></td>
+
+            <td>
+                <div class="user">
+                    <div class="avatar">
+                        <?= strtoupper(substr($row['name'], 0, 1)) ?>
+                    </div>
+
+                    <div>
+                        <?= htmlspecialchars($row['name']) ?>
+                    </div>
+                </div>
+            </td>
+
+            <td><?= htmlspecialchars($row['email']) ?></td>
+
+            <td>
+                <a class="btn-delete"
+                   href="delete.php?id=<?= $row['id'] ?>"
+                   onclick="return confirm('Delete this user?')">
+                   Delete
+                </a>
+            </td>
+
+        </tr>
+        <?php endwhile; ?>
+
+    </table>
 
 </div>
 
-</body>
-</html>
+<?php include("../../includes/footer.php"); ?>

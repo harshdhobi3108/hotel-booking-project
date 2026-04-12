@@ -1,38 +1,44 @@
 <?php
-$path = $_SERVER['PHP_SELF'];
-
 function isActive($keyword) {
     return strpos($_SERVER['PHP_SELF'], $keyword) !== false ? 'active' : '';
 }
 ?>
 
 <div class="sidebar">
+
     <h2 class="logo">HotelLux</h2>
 
-    <a href="/hotel-booking/admin/dashboard.php"
-       class="nav-link <?= isActive('dashboard.php') ?>">
-       🏠 Dashboard
-    </a>
+    <div class="nav-menu">
 
-    <a href="/hotel-booking/admin/modules/rooms/list.php"
-       class="nav-link <?= isActive('/rooms/') ?>">
-       🏨 Rooms
-    </a>
+        <a href="/hotel-booking/admin/dashboard.php"
+           class="nav-link <?= isActive('dashboard.php') ?>">
+           🏠 Dashboard
+        </a>
 
-    <a href="/hotel-booking/admin/modules/bookings/list.php"
-       class="nav-link <?= isActive('/bookings/') ?>">
-       📅 Bookings
-    </a>
+        <a href="/hotel-booking/admin/modules/rooms/list.php"
+           class="nav-link <?= isActive('/rooms/') ?>">
+           🏨 Rooms
+        </a>
 
-    <a href="/hotel-booking/admin/modules/users/list.php"
-       class="nav-link <?= isActive('/users/') ?>">
-       👤 Users
-    </a>
+        <a href="/hotel-booking/admin/modules/bookings/list.php"
+           class="nav-link <?= isActive('/bookings/') ?>">
+           📅 Bookings
+        </a>
 
+        <a href="/hotel-booking/admin/modules/users/list.php"
+           class="nav-link <?= isActive('/users/') ?>">
+           👤 Users
+        </a>
+
+    </div>
+
+    <!-- ✅ SINGLE LOGOUT BUTTON -->
     <a href="/hotel-booking/admin/logout.php"
-       class="nav-link logout">
+       class="nav-link logout-btn"
+       onclick="return confirm('Are you sure you want to logout?')">
        🚪 Logout
     </a>
+
 </div>
 
 <style>
@@ -47,6 +53,7 @@ function isActive($keyword) {
     flex-direction: column;
 }
 
+/* LOGO */
 .logo {
     font-size: 22px;
     font-weight: 700;
@@ -54,6 +61,13 @@ function isActive($keyword) {
     text-align: center;
 }
 
+/* MENU WRAPPER */
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+/* LINKS */
 .nav-link {
     padding: 12px;
     margin: 6px 0;
@@ -75,14 +89,16 @@ function isActive($keyword) {
     font-weight: 600;
 }
 
-.logout {
-    margin-top: auto;
-    background: rgba(255,0,0,0.1);
+/* 🔥 LOGOUT (BOTTOM FIXED) */
+.logout-btn {
+    margin-top: auto; /* pushes it to bottom */
+    background: rgba(255,255,255,0.1);
     color: #ff6b6b;
+    text-align: center;
 }
 
-.logout:hover {
-    background: rgba(255,0,0,0.2);
-    color: white;
+.logout-btn:hover {
+    background: rgba(255, 107, 107, 0.2);
+    color: #fff;
 }
 </style>

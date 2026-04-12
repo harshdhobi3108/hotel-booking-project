@@ -33,7 +33,6 @@ include("includes/header.php");
 ?>
 
 <style>
-/* ===== PAGE ===== */
 .page-container {
     max-width: 1200px;
     margin: 40px auto 60px;
@@ -46,14 +45,12 @@ include("includes/header.php");
     margin-bottom: 25px;
 }
 
-/* ===== GRID ===== */
 .bookings-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 20px;
 }
 
-/* ===== CARD ===== */
 .booking-card {
     background: #fff;
     border-radius: 16px;
@@ -66,14 +63,12 @@ include("includes/header.php");
     transform: translateY(-5px);
 }
 
-/* IMAGE */
 .booking-card img {
     width: 100%;
     height: 180px;
     object-fit: cover;
 }
 
-/* CONTENT */
 .card-body {
     padding: 16px;
 }
@@ -83,7 +78,6 @@ include("includes/header.php");
     font-size: 18px;
 }
 
-/* META */
 .meta {
     font-size: 13px;
     color: #666;
@@ -91,14 +85,12 @@ include("includes/header.php");
     line-height: 1.5;
 }
 
-/* PRICE */
 .price {
     margin-top: 8px;
     font-weight: 600;
     color: #7b2cbf;
 }
 
-/* RATING */
 .rating {
     margin-top: 10px;
 }
@@ -108,7 +100,6 @@ include("includes/header.php");
     color: #555;
 }
 
-/* STARS */
 .stars {
     display: flex;
     gap: 5px;
@@ -126,7 +117,6 @@ include("includes/header.php");
     color: #fbbf24;
 }
 
-/* TOAST */
 #toast {
     position: fixed;
     top: 20px;
@@ -146,7 +136,6 @@ include("includes/header.php");
     transform: translateY(0);
 }
 
-/* MOBILE */
 @media (max-width: 768px) {
     .booking-card img {
         height: 160px;
@@ -163,10 +152,12 @@ include("includes/header.php");
 <?php while ($row = $result->fetch_assoc()): ?>
 
 <div class="booking-card">
-    <img src="/hotel-booking/assets/images/<?php echo $row['image']; ?>">
+
+    <!-- ✅ FIXED IMAGE -->
+    <img src="/hotel-booking/<?php echo htmlspecialchars($row['image']); ?>" alt="room">
 
     <div class="card-body">
-        <h3><?php echo $row['room_name']; ?></h3>
+        <h3><?php echo htmlspecialchars($row['room_name']); ?></h3>
 
         <div class="meta">
             📅 <?php echo $row['booking_date']; ?> → <?php echo $row['check_out']; ?><br>
@@ -189,6 +180,7 @@ include("includes/header.php");
             <?php endif; ?>
         </div>
     </div>
+
 </div>
 
 <?php endwhile; ?>
@@ -196,7 +188,6 @@ include("includes/header.php");
 </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
@@ -221,7 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const rating = parseInt(star.dataset.value);
 
-                // highlight stars
                 stars.forEach(s => s.classList.remove("active"));
                 for (let i = 0; i < rating; i++) {
                     stars[i].classList.add("active");

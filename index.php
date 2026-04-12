@@ -10,7 +10,6 @@ $result = $conn->query("SELECT * FROM rooms LIMIT 8");
 <head>
     <title>HotelLux</title>
 
-    <!-- 🔥 SAME UI CSS -->
     <style>
         body {
             margin: 0;
@@ -156,7 +155,8 @@ $result = $conn->query("SELECT * FROM rooms LIMIT 8");
 
                 <div class="hot">HOT DEAL</div>
 
-                <img src="assets/images/<?php echo $room['image']; ?>" alt="room">
+                <!-- ✅ FIXED IMAGE -->
+                <img src="/hotel-booking/<?php echo htmlspecialchars($room['image']); ?>" alt="room">
 
                 <?php if ($isBooked): ?>
                     <div class="overlay">BOOKED</div>
@@ -165,8 +165,8 @@ $result = $conn->query("SELECT * FROM rooms LIMIT 8");
                 <div class="content">
 
                     <div class="title">
-                        <?php echo $room['name']; ?>
-                        <span class="rating">⭐ <?php echo $room['rating']; ?></span>
+                        <?php echo htmlspecialchars($room['name']); ?>
+                        <span class="rating">⭐ <?php echo htmlspecialchars($room['rating']); ?></span>
                     </div>
 
                     <div class="info">
@@ -176,7 +176,7 @@ $result = $conn->query("SELECT * FROM rooms LIMIT 8");
 
                     <div class="bottom-row">
 
-                        <div class="price">₹<?php echo $room['price']; ?></div>
+                        <div class="price">₹<?php echo htmlspecialchars($room['price']); ?></div>
 
                         <?php if ($isBooked): ?>
                             <a class="btn disabled">Booked</a>

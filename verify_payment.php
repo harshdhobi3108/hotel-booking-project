@@ -52,7 +52,7 @@ if ($booking['razorpay_order_id'] !== $data['razorpay_order_id']) {
 }
 
 // ===============================
-// ✅ INIT API
+// ✅ INIT RAZORPAY
 // ===============================
 $api = new Api($razorpay['key_id'], $razorpay['secret']);
 
@@ -87,6 +87,13 @@ try {
     $amount    = $booking['amount'];
 
     // ===============================
+    // 🔥 VALIDATE DATES
+    // ===============================
+    if ($check_out <= $check_in) {
+        throw new Exception("Invalid booking dates");
+    }
+
+    // ===============================
     // 🔥 AMOUNT VALIDATION
     // ===============================
     if ($payment->amount != ($amount * 100)) {
@@ -94,26 +101,28 @@ try {
     }
 
     // ===============================
-    // 🔍 FINAL OVERLAP CHECK (CRITICAL)
+    // 🔥 FINAL DOUBLE BOOKING CHECK (STRONG LOGIC)
     // ===============================
     $check = $conn->prepare("
         SELECT id FROM orders 
-        WHERE room_id = ? 
+        WHERE room_id = ?
         AND status = 'confirmed'
-        AND (
-            booking_date < ? 
-            AND check_out > ?
+        AND NOT (
+            check_out <= ?
+            OR booking_date >= ?
         )
     ");
-    $check->bind_param("iss", $room_id, $check_out, $check_in);
-    $check->execute();
 
-    if ($check->get_result()->num_rows > 0) {
+    $check->bind_param("iss", $room_id, $check_in, $check_out);
+    $check->execute();
+    $result = $check->get_result();
+
+    if ($result->num_rows > 0) {
         throw new Exception("Room already booked for selected dates");
     }
 
     // ===============================
-    // 🔐 TRANSACTION START
+    // 🔐 START TRANSACTION
     // ===============================
     $conn->begin_transaction();
 
@@ -125,6 +134,7 @@ try {
         (user_id, room_id, amount, payment_id, order_id, status)
         VALUES (?, ?, ?, ?, ?, 'success')
     ");
+
     $stmt->bind_param(
         "iiiss",
         $user_id,
@@ -143,9 +153,11 @@ try {
     // ===============================
     $stmt2 = $conn->prepare("
         UPDATE orders 
-        SET status = 'confirmed', payment_id = ?
+        SET status = 'confirmed',
+            payment_id = ?
         WHERE razorpay_order_id = ?
     ");
+
     $stmt2->bind_param(
         "ss",
         $data['razorpay_payment_id'],
@@ -170,12 +182,18 @@ try {
     $conn->rollback();
 
     $stmt = $conn->prepare("
-        UPDATE orders SET status = 'failed' WHERE razorpay_order_id = ?
+        UPDATE orders 
+        SET status = 'failed' 
+        WHERE razorpay_order_id = ?
     ");
+
     $stmt->bind_param("s", $data['razorpay_order_id']);
     $stmt->execute();
 
-    echo json_encode(["status" => "error", "message" => "Invalid signature"]);
+    echo json_encode([
+        "status" => "error",
+        "message" => "Invalid signature"
+    ]);
 
 } catch (Exception $e) {
 

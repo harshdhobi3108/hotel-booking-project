@@ -1,12 +1,14 @@
 <?php
-require_once("../../includes/auth_check.php");
 require_once("../../includes/db.php");
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 $status = $_GET['status'];
 
-$stmt = $conn->prepare("UPDATE bookings SET status=? WHERE id=?");
-$stmt->bind_param("si", $status, $id);
-$stmt->execute();
+$conn->query("
+    UPDATE orders 
+    SET status='$status' 
+    WHERE id=$id
+");
 
 header("Location: list.php");
+exit;

@@ -57,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const typewriterElement = document.getElementById("typewriter");
 
   if (typewriterElement) {
-
     const texts = [
       "Luxury Stays Redefined",
       "Find Your Dream Hotel",
@@ -95,115 +94,135 @@ document.addEventListener("DOMContentLoaded", () => {
     typeEffect();
   }
 
-  /* ================= BOOKING DATE LOGIC ================= */
-const checkIn = document.getElementById("check_in");
-const checkOut = document.getElementById("check_out");
+  /* ================= DATE LOGIC ================= */
+  const checkIn = document.getElementById("check_in");
+  const checkOut = document.getElementById("check_out");
 
-if (checkIn && checkOut) {
-  checkIn.addEventListener("change", () => {
-    checkOut.min = checkIn.value;
+  if (checkIn && checkOut) {
+    const today = new Date().toISOString().split("T")[0];
+    checkIn.min = today;
 
-    if (checkOut.value && checkOut.value <= checkIn.value) {
-      checkOut.value = "";
-    }
-  });
-}
+    checkIn.addEventListener("change", () => {
+      checkOut.min = checkIn.value;
 
-/* ================= RAZORPAY BOOKING ================= */
-const bookingForm = document.getElementById("bookingForm");
+      if (checkOut.value && checkOut.value <= checkIn.value) {
+        checkOut.value = "";
+      }
+    });
+  }
 
-if (bookingForm) {
-  bookingForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
+  /* ================= BOOKING FLOW ================= */
+  const bookingForm = document.getElementById("bookingForm");
 
-    const room_id = document.querySelector('[name="room_id"]').value;
-    const check_in = document.querySelector('[name="check_in"]').value;
-    const check_out = document.querySelector('[name="check_out"]').value;
-    const time = document.querySelector('[name="time"]').value;
+  if (bookingForm) {
+    bookingForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-    if (!check_in || !check_out || !time) {
-      alert("Please select check-in, check-out and time");
-      return;
-    }
+      const room_id = document.querySelector('[name="room_id"]').value;
+      const check_in = document.querySelector('[name="check_in"]').value;
+      const check_out = document.querySelector('[name="check_out"]').value;
+      const time = document.querySelector('[name="time"]').value;
 
-    if (check_out <= check_in) {
-      alert("Check-out must be after check-in");
-      return;
-    }
-
-    try {
-      /* ================= CREATE ORDER ================= */
-      const response = await fetch("/hotel-booking/create_order.php", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ room_id, check_in, check_out, time })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || data.error) {
-        throw new Error(data.error || "Failed to create order");
+      // ===== VALIDATION =====
+      if (!check_in || !check_out || !time) {
+        alert("Please fill all fields");
+        return;
       }
 
-      /* ================= RAZORPAY ================= */
-      const options = {
-        key: "rzp_test_SahxQ39qIdVeKw",
-        amount: data.amount,
-        currency: "INR",
-        name: "HotelLux",
-        description: "Room Booking",
-        order_id: data.order_id,
+      if (check_out <= check_in) {
+        alert("Check-out must be after check-in");
+        return;
+      }
 
-        handler: async function (response) {
-          try {
-            const verifyRes = await fetch("/hotel-booking/verify_payment.php", {
-              method: "POST",
-              credentials: "include",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                room_id,
-                check_in,
-                check_out,
-                time
-              })
-            });
+      try {
+        /* ================= STEP 1: CHECK AVAILABILITY ================= */
+        const checkRes = await fetch("/hotel-booking/check_availability.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ room_id, check_in, check_out })
+        });
 
-            const verifyData = await verifyRes.json();
+        const checkData = await checkRes.json();
 
-            if (!verifyRes.ok || verifyData.status !== "success") {
-              throw new Error(verifyData.message || "Payment verification failed");
-            }
-
-            alert("✅ Payment Successful! Booking Confirmed.");
-            window.location.href = `/hotel-booking/my-bookings.php`;
-
-          } catch (err) {
-            console.error(err);
-            alert("❌ Payment succeeded but booking failed.");
-          }
-        },
-
-        theme: {
-          color: "#7b2cbf"
+        if (!checkData.available) {
+          alert("❌ Room already booked for selected dates!");
+          return;
         }
-      };
 
-      const rzp = new Razorpay(options);
-      rzp.open();
+        /* ================= STEP 2: CREATE ORDER ================= */
+        const response = await fetch("/hotel-booking/create_order.php", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ room_id, check_in, check_out, time })
+        });
 
-    } catch (error) {
-      console.error(error);
-      alert(error.message || "Something went wrong!");
-    }
-  });
-}
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error || "Order creation failed");
+        }
+
+        /* ================= STEP 3: RAZORPAY ================= */
+        const options = {
+          key: "rzp_test_SahxQ39qIdVeKw",
+          amount: data.amount,
+          currency: "INR",
+          name: "HotelLux",
+          description: "Room Booking",
+          order_id: data.order_id,
+
+          handler: async function (response) {
+            try {
+              const verifyRes = await fetch("/hotel-booking/verify_payment.php", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  room_id,
+                  check_in,
+                  check_out,
+                  time
+                })
+              });
+
+              const verifyData = await verifyRes.json();
+
+              if (!verifyRes.ok || verifyData.status !== "success") {
+                throw new Error(verifyData.message || "Payment verification failed");
+              }
+
+              alert("✅ Booking Confirmed!");
+              window.location.href = "/hotel-booking/my-bookings.php";
+
+            } catch (err) {
+              console.error(err);
+              alert("❌ Payment successful but booking failed");
+            }
+          },
+
+          theme: {
+            color: "#7b2cbf"
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+
+      } catch (error) {
+        console.error(error);
+        alert(error.message || "Something went wrong!");
+      }
+    });
+  }
 
 });

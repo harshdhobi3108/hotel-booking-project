@@ -1,118 +1,112 @@
 <?php
 require_once("../../includes/auth_check.php");
 require_once("../../includes/db.php");
-include("../../includes/sidebar.php");
 
 $result = $conn->query("SELECT * FROM rooms");
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Manage Rooms</title>
+<?php include(__DIR__ . "/../../includes/header.php"); ?>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI';
-            background: #f4f6f9;
-        }
+<style>
 
-        /* MAIN CONTENT */
-        .main-content {
-            margin-left: 240px;
-            padding: 30px;
-        }
+/* ===== TOP BAR ===== */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
 
-        h2 {
-            margin-bottom: 20px;
-        }
+/* ===== TITLE ===== */
+.page-title {
+    font-size: 22px;
+    font-weight: 600;
+}
 
-        /* TOP BAR */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+/* ===== BUTTONS ===== */
+.btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    color: white;
+    display: inline-block;
+    transition: 0.2s;
+}
 
-        /* BUTTONS */
-        .btn {
-            padding: 8px 14px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            color: white;
-            font-size: 13px;
-        }
+.btn:hover {
+    transform: translateY(-1px);
+}
 
-        .add { background: #2ecc71; }
-        .edit { background: #3498db; }
-        .delete { background: #e74c3c; }
+.btn-add { background: #2ecc71; }
+.btn-edit { background: #3498db; }
+.btn-delete { background: #e74c3c; }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
+/* ===== CARD ===== */
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
 
-        /* TABLE */
-        table {
-            width: 100%;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            border-collapse: collapse;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-        }
+/* ===== TABLE ===== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        th, td {
-            padding: 14px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
+.table th {
+    text-align: left;
+    padding: 14px;
+    background: #f9fafb;
+    font-size: 14px;
+}
 
-        th {
-            background: #f9fafb;
-            font-weight: 600;
-        }
+.table td {
+    padding: 14px;
+    border-top: 1px solid #eee;
+    font-size: 14px;
+}
 
-        tr:hover {
-            background: #f4f6f9;
-        }
+/* Hover */
+.table tr:hover {
+    background: #f7f9fc;
+}
 
-        /* STATUS BADGE */
-        .status {
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-        }
+/* ===== STATUS ===== */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
 
-        .available {
-            background: #e6fffa;
-            color: #0f766e;
-        }
+.badge.available {
+    background: #d1fae5;
+    color: #065f46;
+}
 
-        .booked {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
+.badge.booked {
+    background: #fee2e2;
+    color: #991b1b;
+}
 
-    </style>
-</head>
+</style>
 
-<body>
+<!-- ===== HEADER ===== -->
+<div class="top-bar">
+    <div class="page-title">Manage Rooms</div>
+    <a href="add.php" class="btn btn-add">+ Add Room</a>
+</div>
 
-<div class="main-content">
+<!-- ===== TABLE ===== -->
+<div class="card">
 
-    <div class="top-bar">
-        <h2>Manage Rooms</h2>
-        <a href="add.php" class="btn add">+ Add Room</a>
-    </div>
-
-    <table>
+    <table class="table">
         <tr>
             <th>ID</th>
-            <th>Name</th>
+            <th>Room Name</th>
             <th>Price</th>
             <th>Status</th>
             <th>Action</th>
@@ -121,27 +115,32 @@ $result = $conn->query("SELECT * FROM rooms");
         <?php while($row = $result->fetch_assoc()) { ?>
         <tr>
             <td><?= $row['id'] ?></td>
-            <td><?= $row['name'] ?></td>
-            <td>₹<?= $row['price'] ?></td>
+
+            <td><?= htmlspecialchars($row['name']) ?></td>
+
+            <td>₹<?= number_format($row['price']) ?></td>
+
             <td>
-                <span class="status <?= $row['status'] ?>">
+                <span class="badge <?= $row['status'] ?>">
                     <?= ucfirst($row['status']) ?>
                 </span>
             </td>
+
             <td>
-                <a href="edit.php?id=<?= $row['id'] ?>" class="btn edit">Edit</a>
-                <a href="delete.php?id=<?= $row['id'] ?>" 
-                   class="btn delete"
+                <a href="edit.php?id=<?= $row['id'] ?>" class="btn btn-edit">
+                    Edit
+                </a>
+
+                <a href="delete.php?id=<?= $row['id'] ?>"
+                   class="btn btn-delete"
                    onclick="return confirm('Delete this room?')">
                    Delete
                 </a>
             </td>
         </tr>
         <?php } ?>
-
     </table>
 
 </div>
 
-</body>
-</html>
+<?php include(__DIR__ . "/../../includes/footer.php"); ?>
