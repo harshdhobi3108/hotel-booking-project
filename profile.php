@@ -20,10 +20,22 @@ $picture = $_SESSION['user_picture'] ?? 'https://ui-avatars.com/api/?name=' . ur
 
 // ================= BOOKINGS =================
 $query = "
-SELECT o.id as order_id, r.name, r.price, o.status, o.created_at
+SELECT 
+    o.id as order_id, 
+    r.name, 
+    r.price, 
+    o.booking_status,
+    o.refund_amount,
+    o.created_at,
+    o.booking_date,
+    o.booking_time
 FROM orders o
 JOIN rooms r ON o.room_id = r.id
-WHERE o.user_id = ? AND o.status = 'confirmed'
+WHERE o.user_id = ?
+AND (
+    o.booking_status = 'confirmed'
+    OR (o.booking_status = 'cancelled' AND o.booking_date >= CURDATE())
+)
 ORDER BY o.created_at DESC
 ";
 
@@ -48,6 +60,13 @@ while ($row = $result->fetch_assoc()) {
 
 <div class="profile-page">
 
+  <!-- SUCCESS MESSAGE -->
+  <?php if (isset($_GET['msg']) && $_GET['msg'] === 'cancel_success') { ?>
+    <div style="background:#d4edda; color:#155724; padding:10px; margin:15px 0; border-radius:5px;">
+      Booking cancelled successfully.
+    </div>
+  <?php } ?>
+
   <!-- HERO -->
   <div class="profile-hero">
     <div class="hero-left">
@@ -66,7 +85,6 @@ while ($row = $result->fetch_assoc()) {
     </div>
   </div>
 
-  <!-- GRID -->
   <div class="profile-grid">
 
     <!-- LEFT -->
@@ -99,15 +117,22 @@ while ($row = $result->fetch_assoc()) {
     <!-- RIGHT -->
     <div class="right-panel">
 
-      <!-- BOOKINGS -->
       <div class="card">
         <h3>Your Bookings</h3>
 
         <?php if (empty($bookings)) { ?>
-          <p>No confirmed bookings yet.</p>
+          <p>No bookings yet.</p>
         <?php } else { ?>
 
           <?php foreach ($bookings as $b) { ?>
+
+            <?php
+            $checkin_datetime = $b['booking_date'] . ' ' . $b['booking_time'];
+            $checkin = strtotime($checkin_datetime);
+            $free_cancel_deadline = $checkin - (48 * 3600);
+            $current_time = time();
+            $is_free_cancel = $current_time <= $free_cancel_deadline;
+            ?>
 
             <div class="booking">
 
@@ -115,23 +140,48 @@ while ($row = $result->fetch_assoc()) {
                 <h4><?php echo htmlspecialchars($b['name']); ?></h4>
                 <p><?php echo date("d M Y", strtotime($b['created_at'])); ?></p>
 
+                <?php if ($b['booking_status'] === 'confirmed') { ?>
+                  <?php if ($is_free_cancel) { ?>
+                    <p class="cancel-policy free">
+                      Free cancellation until <?php echo date("d M Y, h:i A", $free_cancel_deadline); ?>
+                    </p>
+                  <?php } else { ?>
+                    <p class="cancel-policy warning">
+                      Partial refund may apply
+                    </p>
+                  <?php } ?>
+                <?php } ?>
+
                 <div class="booking-actions">
 
-                  <a href="/hotel-booking/my-bookings.php?id=<?php echo $b['order_id']; ?>" 
-                     class="primary-btn">
+                  <a href="/hotel-booking/my-bookings.php?id=<?php echo $b['order_id']; ?>" class="primary-btn">
                      Open Booking →
                   </a>
 
-                  <a href="/hotel-booking/invoice.php?id=<?php echo $b['order_id']; ?>" 
-                     class="invoice-btn" target="_blank">
+                  <a href="/hotel-booking/invoice.php?id=<?php echo $b['order_id']; ?>" class="invoice-btn" target="_blank">
                      Invoice
                   </a>
+
+                  <?php if ($b['booking_status'] === 'confirmed') { ?>
+                    <a href="/hotel-booking/cancel_booking.php?id=<?php echo $b['order_id']; ?>" 
+                       onclick="return confirm('Are you sure you want to cancel this booking?')"
+                       class="cancel-btn">
+                       Cancel
+                    </a>
+                  <?php } ?>
 
                 </div>
               </div>
 
               <div class="booking-right">
-                <span class="status confirmed">Confirmed</span>
+                <?php if ($b['booking_status'] === 'cancelled') { ?>
+                  <span class="status cancelled">Cancelled</span>
+                  <p style="margin-top:5px; font-size:14px;">
+                    Refund: ₹<?php echo $b['refund_amount']; ?>
+                  </p>
+                <?php } else { ?>
+                  <span class="status confirmed">Confirmed</span>
+                <?php } ?>
               </div>
 
             </div>
@@ -142,7 +192,6 @@ while ($row = $result->fetch_assoc()) {
 
       </div>
 
-      <!-- SETTINGS -->
       <div class="card">
         <h3>Account Settings</h3>
         <button class="full-btn" onclick="openModal()">Update Profile</button>
@@ -154,7 +203,7 @@ while ($row = $result->fetch_assoc()) {
 
 </div>
 
-<!-- ================= MODAL ================= -->
+<!-- ✅ RESTORED MODAL -->
 <div id="editModal" class="modal">
   <div class="modal-content">
 
@@ -163,7 +212,7 @@ while ($row = $result->fetch_assoc()) {
     <form action="/hotel-booking/update_profile.php" method="POST" enctype="multipart/form-data">
       <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>" required>
       <input type="file" name="profile_pic">
-      <button class="btn-primary" type="submit">Update Profile</button>
+      <button class="primary-btn" type="submit">Update Profile</button>
     </form>
 
     <hr>
@@ -173,15 +222,14 @@ while ($row = $result->fetch_assoc()) {
     <form action="/hotel-booking/change_password.php" method="POST">
       <input type="password" name="old_password" placeholder="Old Password" required>
       <input type="password" name="new_password" placeholder="New Password" required>
-      <button class="btn-primary" type="submit">Change Password</button>
+      <button class="primary-btn" type="submit">Change Password</button>
     </form>
 
-    <button class="btn-secondary" onclick="closeModal()">Close</button>
+    <button class="secondary-btn" onclick="closeModal()">Close</button>
 
   </div>
 </div>
 
-<!-- ================= JS ================= -->
 <script>
 function openModal() {
   document.getElementById("editModal").style.display = "flex";

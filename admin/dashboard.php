@@ -3,28 +3,30 @@ require_once("includes/auth_check.php");
 require_once("includes/db.php");
 
 /* USERS */
-$usersData = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc();
-$users = intval($usersData['total'] ?? 0);
+$users = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc()['total'] ?? 0;
 
 /* ROOMS */
-$roomsData = $conn->query("SELECT COUNT(*) as total FROM rooms")->fetch_assoc();
-$rooms = intval($roomsData['total'] ?? 0);
+$rooms = $conn->query("SELECT COUNT(*) as total FROM rooms")->fetch_assoc()['total'] ?? 0;
 
 /* BOOKINGS */
-$bookingsData = $conn->query("
-    SELECT COUNT(*) as total 
-    FROM orders 
-    WHERE status = 'confirmed'
-")->fetch_assoc();
-$bookings = intval($bookingsData['total'] ?? 0);
+$totalBookings = $conn->query("SELECT COUNT(*) as total FROM orders")->fetch_assoc()['total'] ?? 0;
+
+$activeBookings = $conn->query("
+    SELECT COUNT(*) as total FROM orders 
+    WHERE booking_status='confirmed'
+")->fetch_assoc()['total'] ?? 0;
+
+$cancelledBookings = $conn->query("
+    SELECT COUNT(*) as total FROM orders 
+    WHERE booking_status='cancelled'
+")->fetch_assoc()['total'] ?? 0;
 
 /* REVENUE */
-$revenueData = $conn->query("
+$revenue = $conn->query("
     SELECT SUM(amount) as total 
-    FROM payments 
-    WHERE status = 'success'
-")->fetch_assoc();
-$revenue = intval($revenueData['total'] ?? 0);
+    FROM orders 
+    WHERE booking_status='confirmed'
+")->fetch_assoc()['total'] ?? 0;
 
 /* RECENT BOOKINGS */
 $recent = $conn->query("
@@ -39,75 +41,83 @@ $recent = $conn->query("
 
 <style>
 
-/* ===== MAIN DASHBOARD LAYOUT ===== */
-.dashboard-layout {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 25px;
+/* ===== MAIN ===== */
+.dashboard {
     margin-top: 20px;
 }
 
-/* LEFT SIDE */
-.dashboard-left h1 {
-    margin-bottom: 20px;
+/* ===== STATS ===== */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
-/* RIGHT SIDE */
-.dashboard-right {
-    background: #ffffff;
+.stat-card {
+    background: linear-gradient(135deg, #ffffff, #eef2ff);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-6px);
+}
+
+.stat-card h3 {
+    font-size: 14px;
+    color: #666;
+}
+
+.stat-card h2 {
+    font-size: 26px;
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+/* COLORS */
+.users { border-left: 5px solid #3a86ff; }
+.rooms { border-left: 5px solid #22c55e; }
+.total { border-left: 5px solid #6366f1; }
+.active { border-left: 5px solid #10b981; }
+.cancelled { border-left: 5px solid #ef4444; }
+.revenue { 
+    border-left: 5px solid #f59e0b;
+    background: linear-gradient(135deg, #fff7ed, #ffedd5);
+}
+
+/* ===== CARD ===== */
+.card {
+    background: #fff;
     border-radius: 16px;
     padding: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
-/* ===== STATS GRID ===== */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+/* ===== HEADER ROW ===== */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-/* ===== STAT CARDS ===== */
-.stat-card {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    position: relative;
-    transition: 0.3s;
+/* ===== VIEW BUTTON ===== */
+.view-btn {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    transition: 0.2s;
 }
 
-.stat-card:hover {
-    transform: translateY(-5px);
+.view-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(99,102,241,0.3);
 }
-
-.stat-card h3 {
-    font-size: 14px;
-    color: #777;
-}
-
-.stat-card h2 {
-    font-size: 28px;
-    margin-top: 8px;
-    font-weight: bold;
-    color: #111;
-}
-
-/* LEFT BORDER COLORS */
-.stat-card::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 5px;
-    height: 100%;
-    border-radius: 16px 0 0 16px;
-}
-
-.users::before { background: #3a86ff; }
-.rooms::before { background: #2ecc71; }
-.bookings::before { background: #f39c12; }
-.revenue::before { background: #e74c3c; }
 
 /* ===== TABLE ===== */
 .table {
@@ -120,86 +130,112 @@ $recent = $conn->query("
     text-align: left;
     padding: 12px;
     background: #f9fafb;
-    color: #333;
+    font-weight: 600;
+    color: #374151;
 }
 
 .table td {
     padding: 12px;
     border-top: 1px solid #eee;
-    color: #444;
+}
+
+.table tr {
+    transition: 0.2s;
 }
 
 .table tr:hover {
-    background: #f7f9fc;
+    background: #eef2ff;
+    cursor: pointer;
 }
 
-/* ===== STATUS BADGE ===== */
+/* ===== BADGES ===== */
 .badge {
-    padding: 6px 12px;
-    border-radius: 20px;
+    padding: 6px 14px;
+    border-radius: 999px;
     font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
 }
 
-.badge.success {
-    background: #d4edda;
-    color: #155724;
+.badge.active {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1d4ed8;
 }
 
-.badge.danger {
-    background: #f8d7da;
-    color: #721c24;
+.badge.cancelled {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #991b1b;
 }
 
 /* ===== RESPONSIVE ===== */
-@media(max-width: 992px) {
-    .dashboard-layout {
-        grid-template-columns: 1fr;
+@media (max-width: 768px) {
+
+    .stats {
+        grid-template-columns: 1fr !important;
     }
 
-    .dashboard-grid {
-        grid-template-columns: 1fr;
+    .dashboard {
+        width: 100% !important;
     }
+
+    .card {
+        width: 100% !important;
+    }
+
+    .table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
 }
 
 </style>
 
-<div class="dashboard-layout">
+<div class="dashboard">
 
-    <!-- LEFT SIDE -->
-    <div class="dashboard-left">
-        
-        <h1>Welcome, <?= htmlspecialchars($_SESSION['admin_name']) ?> 👋</h1>
+    <!-- ===== STATS ===== -->
+    <div class="stats">
 
-        <div class="dashboard-grid">
+        <div class="stat-card users">
+            <h3>Total Users</h3>
+            <h2><?= $users ?></h2>
+        </div>
 
-            <div class="stat-card users">
-                <h3>Total Users</h3>
-                <h2><?= $users ?></h2>
-            </div>
+        <div class="stat-card rooms">
+            <h3>Total Rooms</h3>
+            <h2><?= $rooms ?></h2>
+        </div>
 
-            <div class="stat-card rooms">
-                <h3>Total Rooms</h3>
-                <h2><?= $rooms ?></h2>
-            </div>
+        <div class="stat-card total">
+            <h3>Total Bookings</h3>
+            <h2><?= $totalBookings ?></h2>
+        </div>
 
-            <div class="stat-card bookings">
-                <h3>Total Bookings</h3>
-                <h2><?= $bookings ?></h2>
-            </div>
+        <div class="stat-card active">
+            <h3>Active Bookings</h3>
+            <h2><?= $activeBookings ?></h2>
+        </div>
 
-            <div class="stat-card revenue">
-                <h3>Total Revenue</h3>
-                <h2>₹<?= number_format($revenue) ?></h2>
-            </div>
+        <div class="stat-card cancelled">
+            <h3>Cancelled Bookings</h3>
+            <h2><?= $cancelledBookings ?></h2>
+        </div>
 
+        <div class="stat-card revenue">
+            <h3>Total Revenue</h3>
+            <h2>₹<?= number_format($revenue) ?></h2>
         </div>
 
     </div>
 
-    <!-- RIGHT SIDE -->
-    <div class="dashboard-right">
+    <!-- ===== RECENT BOOKINGS ===== -->
+    <div class="card">
 
-        <h3>Recent Bookings</h3>
+        <div class="card-header">
+            <h3>Recent Bookings</h3>
+            <a href="modules/bookings/list.php" class="view-btn">View All</a>
+        </div>
 
         <table class="table">
             <tr>
@@ -216,15 +252,17 @@ $recent = $conn->query("
                     <td><?= htmlspecialchars($row['room_name']) ?></td>
                     <td><?= date("Y-m-d", strtotime($row['booking_date'])) ?></td>
                     <td>
-                        <span class="badge <?= $row['status'] == 'confirmed' ? 'success' : 'danger' ?>">
-                            <?= ucfirst($row['status']) ?>
-                        </span>
+                        <?php if($row['booking_status'] == 'confirmed'): ?>
+                            <span class="badge active">Active</span>
+                        <?php else: ?>
+                            <span class="badge cancelled">Cancelled</span>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endwhile; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="4">No bookings found</td>
+                    <td colspan="4" style="text-align:center; padding:20px;">No bookings found</td>
                 </tr>
             <?php endif; ?>
 

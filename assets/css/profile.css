@@ -131,7 +131,6 @@
 .stats h4 {
   margin: 0;
   font-size: 18px;
-  color: #333;
 }
 
 .stats p {
@@ -144,159 +143,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  border-radius: 14px;
-  background: #f8f9fc;
-  margin-top: 12px;
-  transition: 0.3s;
-}
-
-.booking:hover {
-  background: #eef1f7;
-  transform: translateY(-2px);
-}
-
-/* ================= BOOKING CONTENT ================= */
-.booking h4 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.booking p {
-  margin: 4px 0 0;
-  font-size: 12px;
-  color: #777;
-}
-
-/* ================= BOOKING ACTION BUTTONS ================= */
-.booking-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-}
-
-/* COMMON BUTTON STYLE */
-.view-btn,
-.invoice-btn {
-  padding: 6px 12px;
-  font-size: 12px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 500;
-  transition: 0.25s ease;
-  display: inline-block;
-}
-
-/* VIEW BUTTON */
-.view-btn {
-  background: #e0e7ff;
-  color: #3730a3;
-}
-
-.view-btn:hover {
-  background: #c7d2fe;
-  transform: translateY(-1px);
-}
-
-/* INVOICE BUTTON */
-.invoice-btn {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.invoice-btn:hover {
-  background: #bbf7d0;
-  transform: translateY(-1px);
-}
-
-/* ================= STATUS ================= */
-.status {
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.confirmed {
-  background: #d4edda;
-  color: #2e7d32;
-}
-
-.pending {
-  background: #fff3cd;
-  color: #ff9800;
-}
-
-/* ================= BUTTON ================= */
-.full-btn {
-  width: 100%;
-  margin-top: 12px;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #7b2cbf, #9d4edd);
-  color: white;
-  cursor: pointer;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-.full-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(157, 78, 221, 0.3);
-}
-
-/* ACTIVE TEXT */
-.active {
-  color: #2ecc71;
-  font-weight: 600;
-}
-
-/* ================= RESPONSIVE ================= */
-@media (max-width: 768px) {
-  .profile-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-hero {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .hero-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .booking {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .booking-actions {
-    width: 100%;
-  }
-
-  .status {
-    align-self: flex-end;
-  }
-}
-
-/* ================= IMPROVED BOOKING LAYOUT ================= */
-
-.booking {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px;
-  border-radius: 14px;
-  background: #f8f9fc;
-  margin-top: 14px;
-  transition: all 0.25s ease;
-  border: 1px solid transparent;
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff, #f4f6fb);
+  margin-top: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid #ececff;
+  position: relative;
+  overflow: hidden;
 }
 
 .booking:hover {
@@ -309,7 +163,6 @@
 .booking-left h4 {
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 4px;
 }
 
 .booking-left p {
@@ -317,20 +170,29 @@
   color: #777;
 }
 
-/* RIGHT SIDE */
-.booking-right {
-  display: flex;
-  align-items: center;
+/* ================= CANCEL POLICY ================= */
+.cancel-policy {
+  font-size: 13px;
+  margin-top: 5px;
+  font-weight: 500;
 }
 
-/* ACTIONS */
+.cancel-policy.free {
+  color: #28a745;
+}
+
+.cancel-policy.warning {
+  color: #ff9800;
+}
+
+/* ================= ACTIONS ================= */
 .booking-actions {
   margin-top: 12px;
   display: flex;
   gap: 10px;
 }
 
-/* PRIMARY BUTTON (MAIN CTA) */
+/* PRIMARY BUTTON */
 .primary-btn {
   padding: 7px 14px;
   border-radius: 8px;
@@ -356,19 +218,36 @@
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
-  transition: 0.25s;
 }
 
 .invoice-btn:hover {
   background: #bbf7d0;
 }
 
-/* STATUS IMPROVEMENT */
+/* CANCEL BUTTON */
+.cancel-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.cancel-btn:hover {
+  background: #dc2626;
+  color: #fff;
+  box-shadow: 0 6px 15px rgba(220, 38, 38, 0.3);
+}
+
+/* ================= STATUS ================= */
 .status {
   padding: 6px 14px;
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .confirmed {
@@ -376,174 +255,56 @@
   color: #065f46;
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
+.cancelled {
+  background: #ffe4e6;
+  color: #b91c1c;
 }
 
-/* ================= MODAL OVERLAY ================= */
+/* ================= REFUND TEXT ================= */
+/* REFUND */
+.refund-text {
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+}
+
+/* divider */
+.booking + .booking {
+  border-top: 1px dashed #e5e7eb;
+}
+
+/* ================= MODAL (🔥 FIXED) ================= */
 .modal {
   display: none;
   position: fixed;
   top: 0;
   left: 0;
-
   width: 100%;
   height: 100%;
-
   background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(25px);
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
-/* ================= MODAL BOX ================= */
+/* Modal Box */
 .modal-content {
   width: 420px;
-  padding: 32px;
-  border-radius: 18px;
-
+  max-width: 90%;
+  padding: 30px;
+  border-radius: 16px;
   background: #ffffff;
-  color: #222;
-
-  box-shadow: 
-    0 25px 60px rgba(0,0,0,0.25),
-    0 5px 15px rgba(0,0,0,0.1);
-
-  animation: modalFade 0.25s ease;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  animation: fadeInScale 0.25s ease;
 }
 
-/* ================= TITLE ================= */
-.modal-content h2 {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 20px;
-}
-
-/* ================= INPUTS ================= */
-.modal-content input[type="text"],
-.modal-content input[type="password"] {
-  width: 100%;
-  padding: 14px;
-  margin-bottom: 18px;
-
-  border-radius: 12px;
-  border: 1px solid #e5e5e5;
-
-  background: #fafafa;
-  font-size: 14px;
-
-  transition: 0.25s ease;
-}
-
-/* FOCUS */
-.modal-content input:focus {
-  border-color: #7b2cbf;
-  box-shadow: 0 0 0 3px rgba(123,44,191,0.15);
-  outline: none;
-}
-
-.modal-content input::placeholder {
-  color: #aaa;
-}
-
-/* ================= FILE INPUT ================= */
-.modal-content input[type="file"] {
-  border: none;
-  padding: 0;
-}
-
-/* CUSTOM FILE UI */
-.file-upload {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.file-upload label {
-  padding: 8px 14px;
-  background: #f3f0ff;
-  color: #7b2cbf;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: 0.2s;
-}
-
-.file-upload label:hover {
-  background: #e6ddff;
-}
-
-.file-upload span {
-  font-size: 13px;
-  color: #777;
-}
-
-/* ================= BUTTON BASE ================= */
-.modal-content button {
-  width: 100%;
-  padding: 13px;
-  margin-top: 12px;
-
-  border-radius: 12px;
-  border: none;
-
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-
-  transition: 0.25s ease;
-}
-
-/* PRIMARY BUTTON */
-.primary-btn {
-  background: linear-gradient(135deg, #7b2cbf, #9d4edd);
-  color: #fff;
-}
-
-.primary-btn:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 10px 20px rgba(123,44,191,0.3);
-}
-
-.primary-btn:active {
-  transform: scale(0.98);
-}
-
-/* SECONDARY BUTTON */
-.secondary-btn {
-  background: #f3f3f3;
-  color: #444;
-}
-
-.secondary-btn:hover {
-  background: #e6e6e6;
-}
-
-/* ================= DIVIDER ================= */
-.modal-content hr {
-  border: none;
-  border-top: 1px solid #eee;
-  margin: 22px 0;
-}
-
-/* ================= ANIMATION ================= */
-@keyframes modalFade {
+/* Animation */
+@keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.9);
   }
   to {
     opacity: 1;
@@ -551,10 +312,190 @@
   }
 }
 
-/* ================= RESPONSIVE ================= */
+/* Inputs */
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.modal-content input:focus {
+  border-color: #7b2cbf;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(123, 44, 191, 0.1);
+}
+
+/* Buttons */
+.modal-content .primary-btn {
+  width: 100%;
+}
+
+.secondary-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #f3f3f3;
+  color: #444;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background: #e0e0e0;
+}
+
+/* Divider */
+.modal-content hr {
+  margin: 15px 0;
+  border: none;
+  height: 1px;
+  background: #eee;
+}
+
+/* ================= UPGRADED UPDATE PROFILE BUTTON ================= */
+.full-btn {
+  padding: 12px 22px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Hover */
+.full-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(123, 44, 191, 0.35);
+}
+
+/* Click */
+.full-btn:active {
+  transform: scale(0.96);
+}
+
+/* ================= ACCOUNT SETTINGS CARD IMPROVEMENT ================= */
+.card h3 {
+  margin-bottom: 15px;
+}
+
+/* Add spacing inside account settings card */
+.card:last-child {
+  padding: 28px;
+}
+
+/* ================= RESPONSIVE (UPGRADED) ================= */
+@media (max-width: 992px) {
+  .profile-page {
+    padding: 25px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+  /* HERO */
+  .profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .hero-left {
+    width: 100%;
+  }
+
+  .hero-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .edit-btn,
+  .hero-actions .logout {
+    flex: 1;
+    text-align: center;
+  }
+
+  /* CARDS */
+  .card {
+    padding: 20px;
+  }
+
+  /* BOOKINGS */
+  .booking {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .booking-right {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .booking-actions {
+    width: 100%;
+  }
+
+  .primary-btn,
+  .invoice-btn,
+  .cancel-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  /* STATS */
+  .stats {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* BUTTON */
+  .full-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* SMALL MOBILE */
 @media (max-width: 480px) {
-  .modal-content {
-    width: 90%;
-    padding: 24px;
+
+  .user-info h1 {
+    font-size: 20px;
+  }
+
+  .avatar {
+    width: 65px;
+    height: 65px;
+  }
+
+  .booking-left h4 {
+    font-size: 15px;
+  }
+
+  .booking-left p {
+    font-size: 12px;
+  }
+
+  .status {
+    font-size: 11px;
+    padding: 5px 10px;
   }
 }

@@ -93,6 +93,41 @@ $result = $conn->query("SELECT * FROM rooms");
     color: #991b1b;
 }
 
+/* ===== ✅ NEW RESPONSIVE FIX (ONLY ADD) ===== */
+
+/* TABLE SCROLL */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* MOBILE FIX */
+@media (max-width: 768px) {
+
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .btn-add {
+        width: 100%;
+        text-align: center;
+    }
+
+    .table {
+        min-width: 600px;
+    }
+
+    .btn-edit,
+    .btn-delete {
+        display: block;
+        margin-bottom: 6px;
+        text-align: center;
+    }
+
+}
+
 </style>
 
 <!-- ===== HEADER ===== -->
@@ -104,65 +139,68 @@ $result = $conn->query("SELECT * FROM rooms");
 <!-- ===== TABLE ===== -->
 <div class="card">
 
-    <table class="table">
-        <tr>
-            <th>ID</th>
-            <th>Room Name</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
+    <!-- ✅ WRAPPER ADDED -->
+    <div class="table-wrapper">
 
-        <?php while($row = $result->fetch_assoc()) { 
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Room Name</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
 
-            // 🔥 CHECK IF ROOM IS CURRENTLY BOOKED (TODAY BASED)
-            $room_id = $row['id'];
-            $today = date('Y-m-d');
+            <?php while($row = $result->fetch_assoc()) { 
 
-            $checkQuery = "
-                SELECT id FROM orders 
-                WHERE room_id = '$room_id'
-                AND booking_date <= '$today'
-                AND check_out >= '$today'
-                LIMIT 1
-            ";
+                $room_id = $row['id'];
+                $today = date('Y-m-d');
 
-            $checkResult = $conn->query($checkQuery);
+                $checkQuery = "
+                    SELECT id FROM orders 
+                    WHERE room_id = '$room_id'
+                    AND booking_date <= '$today'
+                    AND check_out >= '$today'
+                    LIMIT 1
+                ";
 
-            $isBooked = $checkResult->num_rows > 0;
+                $checkResult = $conn->query($checkQuery);
 
-            $status = $isBooked ? 'booked' : 'available';
-        ?>
+                $isBooked = $checkResult->num_rows > 0;
+                $status = $isBooked ? 'booked' : 'available';
+            ?>
 
-        <tr>
-            <td><?= $row['id'] ?></td>
+            <tr>
+                <td><?= $row['id'] ?></td>
 
-            <td><?= htmlspecialchars($row['name']) ?></td>
+                <td><?= htmlspecialchars($row['name']) ?></td>
 
-            <td>₹<?= number_format($row['price']) ?></td>
+                <td>₹<?= number_format($row['price']) ?></td>
 
-            <td>
-                <span class="badge <?= $status ?>">
-                    <?= ucfirst($status) ?>
-                </span>
-            </td>
+                <td>
+                    <span class="badge <?= $status ?>">
+                        <?= ucfirst($status) ?>
+                    </span>
+                </td>
 
-            <td>
-                <a href="edit.php?id=<?= $row['id'] ?>" class="btn btn-edit">
-                    Edit
-                </a>
+                <td>
+                    <a href="edit.php?id=<?= $row['id'] ?>" class="btn btn-edit">
+                        Edit
+                    </a>
 
-                <a href="delete.php?id=<?= $row['id'] ?>"
-                   class="btn btn-delete"
-                   onclick="return confirm('Delete this room?')">
-                   Delete
-                </a>
-            </td>
-        </tr>
+                    <a href="delete.php?id=<?= $row['id'] ?>"
+                       class="btn btn-delete"
+                       onclick="return confirm('Delete this room?')">
+                       Delete
+                    </a>
+                </td>
+            </tr>
 
-        <?php } ?>
+            <?php } ?>
 
-    </table>
+        </table>
+
+    </div>
 
 </div>
 

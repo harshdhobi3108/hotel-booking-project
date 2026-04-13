@@ -6,105 +6,148 @@ function isActive($keyword) {
 
 <div class="sidebar">
 
-    <div>
+    <!-- LOGO -->
+    <div class="sidebar-top">
         <h2 class="logo">HotelLux</h2>
 
         <div class="nav-menu">
 
             <a href="/hotel-booking/admin/dashboard.php"
                class="nav-link <?= isActive('dashboard.php') ?>">
-               🏠 Dashboard
+               <span class="icon">🏠</span>
+               <span>Dashboard</span>
             </a>
 
             <a href="/hotel-booking/admin/modules/rooms/list.php"
                class="nav-link <?= isActive('/rooms/') ?>">
-               🏨 Rooms
+               <span class="icon">🏨</span>
+               <span>Rooms</span>
             </a>
 
             <a href="/hotel-booking/admin/modules/bookings/list.php"
                class="nav-link <?= isActive('/bookings/') ?>">
-               📅 Bookings
+               <span class="icon">📅</span>
+               <span>Bookings</span>
             </a>
 
             <a href="/hotel-booking/admin/modules/users/list.php"
                class="nav-link <?= isActive('/users/') ?>">
-               👤 Users
+               <span class="icon">👤</span>
+               <span>Users</span>
             </a>
 
         </div>
     </div>
 
-    <!-- 🔥 LOGOUT BUTTON -->
-    <a href="/hotel-booking/admin/logout.php"
-       class="nav-link logout-btn"
-       onclick="return confirm('Are you sure you want to logout?')">
-       🚪 Logout
-    </a>
+    <!-- LOGOUT -->
+    <div class="sidebar-bottom">
+        <a href="/hotel-booking/admin/logout.php"
+           class="nav-link logout-btn"
+           onclick="return confirm('Are you sure you want to logout?')">
+           <span class="icon">🚪</span>
+           <span>Logout</span>
+        </a>
+    </div>
 
 </div>
 
 <style>
+
+/* ================= SIDEBAR ================= */
 .sidebar {
-    width: 240px;
+    width: 250px;
     height: 100vh;
-    background: linear-gradient(180deg, #1e293b, #0f172a);
+    background: linear-gradient(180deg, #0f172a, #020617);
     color: white;
     position: fixed;
     left: 0;
     top: 0;
-    padding: 25px 15px;
+    padding: 20px 15px;
 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    transition: 0.3s;
+    z-index: 1000;
 }
 
-/* LOGO */
+/* ================= LOGO ================= */
 .logo {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     text-align: center;
+    letter-spacing: 1px;
 }
 
-/* MENU */
+/* ================= MENU ================= */
 .nav-menu {
     display: flex;
     flex-direction: column;
+    gap: 5px;
 }
 
-/* LINKS */
+/* ================= LINK ================= */
 .nav-link {
-    padding: 12px;
-    margin: 6px 0;
-    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 12px 14px;
+    border-radius: 12px;
     text-decoration: none;
-    color: #cbd5e1;
-    transition: 0.3s;
+    color: #94a3b8;
+    font-size: 14px;
+    transition: 0.25s;
 }
 
+/* ICON */
+.icon {
+    font-size: 16px;
+}
+
+/* HOVER */
 .nav-link:hover {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.05);
     color: #fff;
-    transform: translateX(5px);
+    transform: translateX(4px);
 }
 
+/* ACTIVE */
 .nav-link.active {
-    background: linear-gradient(135deg, #6c2bd9, #9333ea);
-    color: white;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #fff;
     font-weight: 600;
+    box-shadow: 0 6px 15px rgba(124,58,237,0.3);
 }
 
-/* LOGOUT */
+/* ================= LOGOUT ================= */
+.sidebar-bottom {
+    margin-top: 20px;
+}
+
 .logout-btn {
-    margin-top: auto;
-    background: rgba(255,255,255,0.1);
-    color: #ff6b6b;
-    text-align: center;
+    background: rgba(255,255,255,0.05);
+    color: #f87171;
 }
 
 .logout-btn:hover {
-    background: rgba(255, 107, 107, 0.2);
+    background: rgba(248,113,113,0.2);
     color: #fff;
 }
+
+/* ===== MOBILE SIDEBAR FIX ===== */
+@media (max-width: 768px) {
+
+    .sidebar {
+        transform: translateX(-100%) !important;
+    }
+
+    .sidebar.active {
+        transform: translateX(0) !important;
+    }
+
+}
+
 </style>

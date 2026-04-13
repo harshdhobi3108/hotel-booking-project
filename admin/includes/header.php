@@ -8,10 +8,11 @@ if (session_status() === PHP_SESSION_NONE) {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Panel - HotelLux</title>
 
 <style>
-    
+
 /* ================= RESET ================= */
 * {
     margin: 0;
@@ -19,15 +20,15 @@ if (session_status() === PHP_SESSION_NONE) {
     box-sizing: border-box;
 }
 
+/* ❗ FIX: REMOVE FLEX FROM BODY */
 body {
     font-family: 'Segoe UI', sans-serif;
     background: #f4f6f9;
-    display: flex;
 }
 
 /* ================= SIDEBAR ================= */
 .sidebar {
-    width: 240px;
+    width: 250px;
     height: 100vh;
     background: linear-gradient(180deg, #10002b, #3c096c);
     color: white;
@@ -35,9 +36,7 @@ body {
     left: 0;
     top: 0;
     padding: 20px;
-
-    display: flex;
-    flex-direction: column;
+    transition: 0.3s;
     z-index: 1000;
 }
 
@@ -67,86 +66,91 @@ body {
 
 /* ================= MAIN ================= */
 .main {
-    margin-left: 240px;
-    padding: 30px;
-    width: calc(100% - 240px);
+    margin-left: 250px;
+    width: calc(100% - 250px);
     min-height: 100vh;
-
     display: flex;
     flex-direction: column;
 }
 
-.main > * {
-    width: 100%;
-}
-
-/* ================= CARD ================= */
-.card {
+/* ================= TOPBAR ================= */
+.topbar {
+    height: 60px;
     background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.menu-toggle {
+    font-size: 22px;
+    cursor: pointer;
+    display: none;
+}
+
+.admin-info {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ================= CONTENT ================= */
+.content {
     padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-}
-
-/* ================= TABLE ================= */
-.table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
 }
 
-.table th {
-    text-align: left;
-    padding: 12px;
-    background: #f9fafb;
-}
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
 
-.table td {
-    padding: 12px;
-    border-top: 1px solid #eee;
-}
+    .sidebar {
+        left: -260px;
+    }
 
-.table tr:hover {
-    background: #f7f9fc;
-}
+    .sidebar.active {
+        left: 0;
+    }
 
-/* ================= BADGES ================= */
-.badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-}
+    .main {
+        margin-left: 0;
+        width: 100%;
+    }
 
-.badge.success {
-    background: #d4edda;
-    color: #155724;
+    .menu-toggle {
+        display: block;
+    }
 }
-
-.badge.danger {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-/* ================= BUTTONS ================= */
-.btn {
-    padding: 6px 12px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 13px;
-    color: white;
-}
-
-.btn-edit { background: #3498db; }
-.btn-delete { background: #e74c3c; }
-.btn-add { background: #2ecc71; }
 
 </style>
+
 </head>
 
 <body>
 
-<!-- ✅ USE SIDEBAR FROM sidebar.php -->
+<!-- SIDEBAR -->
 <?php include(__DIR__ . "/sidebar.php"); ?>
 
-<!-- MAIN CONTENT START -->
+<!-- MAIN -->
 <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <span class="menu-toggle" onclick="toggleSidebar()">☰</span>
+
+        <div class="admin-info">
+            👤 <?= htmlspecialchars($_SESSION['admin_name']) ?>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+<script>
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+}
+</script>

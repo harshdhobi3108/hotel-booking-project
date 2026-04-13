@@ -79,6 +79,49 @@ $result = $conn->query("SELECT * FROM users ORDER BY id DESC");
     color: #888;
 }
 
+/* ================== ✅ RESPONSIVE ONLY ADDED ================== */
+
+/* TABLE SCROLL */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+    /* TOP BAR STACK */
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    /* SEARCH FULL WIDTH */
+    .search-box input {
+        width: 100%;
+    }
+
+    /* PREVENT TABLE SHRINK */
+    .table {
+        min-width: 600px;
+    }
+
+    /* BUTTON FULL WIDTH */
+    .btn-delete {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* EXTRA SMALL */
+@media (max-width: 480px) {
+    .table {
+        min-width: 500px;
+    }
+}
+
 </style>
 
 <div class="top-bar">
@@ -94,6 +137,9 @@ $result = $conn->query("SELECT * FROM users ORDER BY id DESC");
 </div>
 
 <div class="card">
+
+    <!-- ✅ WRAPPER ADDED -->
+    <div class="table-wrapper">
 
     <table class="table">
         <thead>
@@ -135,6 +181,8 @@ $result = $conn->query("SELECT * FROM users ORDER BY id DESC");
         </tbody>
 
     </table>
+
+    </div>
 
 </div>
 
