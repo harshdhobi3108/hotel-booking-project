@@ -4,12 +4,6 @@ include("includes/header.php");
 
 $result = $conn->query("SELECT * FROM rooms LIMIT 8");
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>HotelLux</title>
-
     <style>
         body {
             margin: 0;
@@ -107,6 +101,64 @@ $result = $conn->query("SELECT * FROM rooms LIMIT 8");
             background: gray;
             pointer-events: none;
         }
+
+        /* ================= HOMEPAGE MOBILE FIX ================= */
+
+        @media (max-width: 768px) {
+
+        .container {
+            padding: 20px 15px !important;
+        }
+
+        .rooms {
+            grid-template-columns: 1fr !important;
+            gap: 20px;
+        }
+
+        .card {
+            border-radius: 12px;
+        }
+
+        .card img {
+            height: 200px;
+        }
+
+        .content {
+            padding: 12px;
+        }
+
+        .title {
+            font-size: 16px;
+        }
+
+        .price {
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        }
+
+        /* ================= EXTRA SMALL DEVICES ================= */
+
+        @media (max-width: 480px) {
+
+        .container {
+            padding: 15px 10px !important;
+        }
+
+        .hero {
+            padding: 60px 15px;
+        }
+
+        .hero-title {
+            font-size: 1.6rem;
+        }
+
+        }
     </style>
 </head>
 
@@ -128,7 +180,7 @@ $result = $conn->query("SELECT * FROM rooms LIMIT 8");
 
         <div class="hero-buttons">
             <a href="rooms.php" class="btn-primary">Explore Rooms</a>
-            <a href="booking.php" class="btn-secondary">Book Now</a>
+            <a href="rooms.php" class="btn-secondary">Book Now</a>
         </div>
     </div>
 </section>

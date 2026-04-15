@@ -393,109 +393,92 @@
   padding: 28px;
 }
 
-/* ================= RESPONSIVE (UPGRADED) ================= */
+/* ================= RESPONSIVE FIX ================= */
+
+/* Tablet */
 @media (max-width: 992px) {
-  .profile-page {
-    padding: 25px;
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+  .profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .hero-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .hero-actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .avatar {
+    width: 70px;
+    height: 70px;
   }
 
   .profile-grid {
     grid-template-columns: 1fr;
   }
-}
 
-/* MOBILE */
-@media (max-width: 768px) {
-
-  /* HERO */
-  .profile-hero {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-    padding: 20px;
-  }
-
-  .hero-left {
-    width: 100%;
-  }
-
-  .hero-actions {
-    width: 100%;
-    flex-wrap: wrap;
-  }
-
-  .edit-btn,
-  .hero-actions .logout {
-    flex: 1;
-    text-align: center;
-  }
-
-  /* CARDS */
-  .card {
-    padding: 20px;
-  }
-
-  /* BOOKINGS */
   .booking {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 18px;
+    gap: 15px;
   }
 
   .booking-right {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    align-self: flex-start;
   }
 
   .booking-actions {
-    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
-  .primary-btn,
-  .invoice-btn,
-  .cancel-btn {
-    flex: 1;
+  .booking-actions a {
+    flex: 1 1 100%;
     text-align: center;
   }
 
-  /* STATS */
-  .stats {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  /* BUTTON */
-  .full-btn {
-    width: 100%;
-    justify-content: center;
-  }
 }
 
-/* SMALL MOBILE */
+/* Small Mobile */
 @media (max-width: 480px) {
 
-  .user-info h1 {
-    font-size: 20px;
+  .container,
+  .profile-page {
+    padding: 15px;
   }
 
-  .avatar {
-    width: 65px;
-    height: 65px;
+  .card {
+    padding: 15px;
   }
 
-  .booking-left h4 {
-    font-size: 15px;
+  .hero-actions button {
+    width: 100%;
   }
 
-  .booking-left p {
-    font-size: 12px;
+  .modal-content {
+    width: 90%;
+    padding: 20px;
   }
 
-  .status {
-    font-size: 11px;
-    padding: 5px 10px;
-  }
 }

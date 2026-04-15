@@ -174,4 +174,105 @@
     grid-template-columns: 1fr;
     margin-top: -50px;
   }
+  
+/* ================= EXTRA RESPONSIVE (ADD ONLY) ================= */
+
+/* Tablet refinement */
+@media (max-width: 768px) {
+
+  /* HERO */
+  .contact-hero {
+    height: 40vh;
+  }
+
+  .contact-hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .contact-hero-content p {
+    font-size: 14px;
+  }
+
+  /* CONTAINER */
+  .contact-container {
+    padding: 15px;
+    gap: 20px;
+  }
+
+  /* FORM */
+  .contact-form {
+    padding: 25px;
+  }
+
+  /* INFO CARDS → 2 COLUMN GRID */
+  .contact-info {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .info-card {
+    width: 48%;
+    padding: 15px;
+  }
+}
+
+
+/* Mobile optimization */
+@media (max-width: 480px) {
+
+  /* HERO */
+  .contact-hero {
+    height: 35vh;
+  }
+
+  .contact-hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .contact-hero-content p {
+    font-size: 13px;
+  }
+
+  /* CONTAINER */
+  .contact-container {
+    margin-top: -40px;
+    padding: 10px;
+  }
+
+  /* FORM */
+  .contact-form {
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  /* INPUT */
+  .input-group input,
+  .input-group textarea {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* BUTTON */
+  .send-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* INFO CARDS → FULL WIDTH */
+  .info-card {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .info-icon {
+    font-size: 18px;
+  }
+
+  /* MAP */
+  .map-section iframe {
+    height: 250px;
+  }
+}
+
 }

@@ -141,6 +141,91 @@ include("includes/header.php");
         height: 160px;
     }
 }
+
+/* ================= EXTRA RESPONSIVE ================= */
+
+@media (max-width: 992px) {
+    .page-container {
+        margin: 30px auto 50px;
+        padding: 0 15px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    .booking-card img {
+        height: 160px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .bookings-grid {
+        gap: 15px;
+    }
+
+    .card-body h3 {
+        font-size: 16px;
+    }
+
+    .meta {
+        font-size: 12px;
+    }
+
+    .price {
+        font-size: 14px;
+    }
+
+    .star {
+        font-size: 16px;
+    }
+
+    #toast {
+        right: 10px;
+        left: 10px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-container {
+        padding: 0 10px;
+    }
+
+    .booking-card {
+        border-radius: 12px;
+    }
+
+    .booking-card img {
+        height: 140px;
+    }
+
+    .card-body {
+        padding: 12px;
+    }
+
+    .card-body h3 {
+        font-size: 15px;
+    }
+
+    .meta {
+        font-size: 11px;
+    }
+
+    .price {
+        font-size: 13px;
+    }
+
+    .star {
+        font-size: 15px;
+    }
+}
+
 </style>
 
 <div class="page-container">

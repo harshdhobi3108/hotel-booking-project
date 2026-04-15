@@ -30,149 +30,213 @@ if (isset($_GET['success'])) {
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+      }
 
-body {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #240046, #5a189a, #9d4edd);
-}
+      body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #240046, #5a189a, #9d4edd);
+      }
 
-.auth-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+      .auth-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-.auth-card {
-  width: 400px;
-  padding: 40px 30px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  color: white;
-}
+      .auth-card {
+        width: 400px;
+        padding: 40px 30px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        color: white;
+      }
 
-.auth-card h2 {
-  font-weight: 600;
-  margin-bottom: 8px;
-}
+      .auth-card h2 {
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
 
-.subtitle {
-  font-size: 14px;
-  color: #ddd;
-  margin-bottom: 20px;
-}
+      .subtitle {
+        font-size: 14px;
+        color: #ddd;
+        margin-bottom: 20px;
+      }
 
-/* SUCCESS */
-.success {
-  background: rgba(46, 204, 113, 0.15);
-  color: #2ecc71;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-  font-size: 13px;
-}
+      /* SUCCESS */
+      .success {
+        background: rgba(46, 204, 113, 0.15);
+        color: #2ecc71;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        font-size: 13px;
+      }
 
-/* ERROR */
-.error {
-  color: #ff6b6b;
-  font-size: 13px;
-  margin-bottom: 10px;
-}
+      /* ERROR */
+      .error {
+        color: #ff6b6b;
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
 
-/* INPUT */
-.input-group {
-  position: relative;
-  margin-bottom: 20px;
-}
+      /* INPUT */
+      .input-group {
+        position: relative;
+        margin-bottom: 20px;
+      }
 
-.input-group input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.3);
-  background: transparent;
-  color: white;
-  outline: none;
-}
+      .input-group input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background: transparent;
+        color: white;
+        outline: none;
+      }
 
-.input-group label {
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  transform: translateY(-50%);
-  font-size: 13px;
-  color: #ccc;
-  transition: 0.3s;
-}
+      .input-group label {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        font-size: 13px;
+        color: #ccc;
+        transition: 0.3s;
+      }
 
-.input-group input:focus + label,
-.input-group input:valid + label {
-  top: -8px;
-  font-size: 11px;
-  color: #c77dff;
-}
+      .input-group input:focus + label,
+      .input-group input:valid + label {
+        top: -8px;
+        font-size: 11px;
+        color: #c77dff;
+      }
 
-/* BUTTON */
-.login-btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #7b2cbf, #9d4edd);
-  color: white;
-  cursor: pointer;
-}
+      /* BUTTON */
+      .login-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+        color: white;
+        cursor: pointer;
+      }
 
-.login-btn:hover {
-  transform: translateY(-2px);
-}
+      .login-btn:hover {
+        transform: translateY(-2px);
+      }
 
-/* GOOGLE */
-.google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 12px;
-  border-radius: 10px;
-  text-decoration: none;
-  background: white;
-  color: #333;
-  margin-top: 15px;
-}
+      /* GOOGLE */
+      .google-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px;
+        border-radius: 10px;
+        text-decoration: none;
+        background: white;
+        color: #333;
+        margin-top: 15px;
+      }
 
-.google-btn img {
-  width: 18px;
-}
+      .google-btn img {
+        width: 18px;
+      }
 
-.divider {
-  margin: 20px 0;
-  font-size: 12px;
-  color: #ccc;
-}
+      .divider {
+        margin: 20px 0;
+        font-size: 12px;
+        color: #ccc;
+      }
 
-.links {
-  margin-top: 15px;
-  font-size: 13px;
-}
+      .links {
+        margin-top: 15px;
+        font-size: 13px;
+      }
 
-.links a {
-  color: #e0aaff;
-  text-decoration: none;
-}
+      .links a {
+        color: #e0aaff;
+        text-decoration: none;
+      }
+
+      /* ================= RESPONSIVE FIX ================= */
+
+      /* Tablets */
+      @media (max-width: 768px) {
+        .auth-card {
+          width: 90%;
+          padding: 30px 20px;
+        }
+
+        .auth-card h2 {
+          font-size: 20px;
+        }
+
+        .subtitle {
+          font-size: 13px;
+        }
+
+        .login-btn,
+        .google-btn {
+          padding: 11px;
+          font-size: 14px;
+        }
+      }
+
+      /* Mobile */
+      @media (max-width: 480px) {
+        body {
+          padding: 15px;
+        }
+
+        .auth-card {
+          width: 100%;
+          padding: 25px 15px;
+          border-radius: 14px;
+        }
+
+        .auth-card h2 {
+          font-size: 18px;
+        }
+
+        .subtitle {
+          font-size: 12px;
+        }
+
+        .input-group input {
+          padding: 10px;
+          font-size: 14px;
+        }
+
+        .login-btn {
+          padding: 10px;
+          font-size: 14px;
+        }
+
+        .google-btn {
+          padding: 10px;
+          font-size: 13px;
+        }
+
+        .links {
+          font-size: 12px;
+        }
+      }
   </style>
 </head>
 

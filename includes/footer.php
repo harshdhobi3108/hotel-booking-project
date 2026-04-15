@@ -22,9 +22,9 @@
     <div class="footer-col">
       <h3>Support</h3>
       <ul>
-        <li><a href="#">FAQs</a></li>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms & Conditions</a></li>
+        <li><a href="faq.php">FAQs</a></li>
+        <li><a href="privacy.php">Privacy Policy</a></li>
+        <li><a href="terms.php">Terms & Conditions</a></li>
       </ul>
     </div>
 

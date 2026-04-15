@@ -194,6 +194,99 @@ if (isset($_GET['error'])) {
       font-size: 13px;
       margin-bottom: 10px;
     }
+
+    /* ================= RESPONSIVE FIX ================= */
+
+    /* Tablets */
+    @media (max-width: 768px) {
+      .auth-card {
+        width: 90%;
+        padding: 30px 20px;
+      }
+
+      .auth-card h2 {
+        font-size: 20px;
+      }
+
+      .subtitle {
+        font-size: 13px;
+      }
+
+      .login-btn,
+      .google-btn {
+        padding: 11px;
+        font-size: 14px;
+      }
+    }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+        align-items: flex-start; /* 👈 important for small screens */
+      }
+
+      .auth-card {
+        width: 100%;
+        padding: 25px 15px;
+        border-radius: 14px;
+        margin-top: 20px;
+      }
+
+      .auth-card h2 {
+        font-size: 18px;
+      }
+
+      .subtitle {
+        font-size: 12px;
+      }
+
+      .input-group input {
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      .login-btn {
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      .google-btn {
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .links {
+        font-size: 12px;
+      }
+    }
+
+    /* ================= FINAL PERFECT CENTER FIX ================= */
+
+/* Fix full height stretching */
+body {
+  min-height: 100dvh;
+  height: auto;
+}
+
+/* Make container control spacing properly */
+.auth-container {
+  min-height: 100dvh;
+}
+
+/* Mobile optimization */
+@media (max-width: 480px) {
+
+  .auth-container {
+    align-items: flex-start; /* move slightly down */
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
+
+  .auth-card {
+    margin: 0 auto;
+  }
+}
   </style>
 
 </head>

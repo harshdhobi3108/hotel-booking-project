@@ -610,6 +610,7 @@ body {
   display: none;
   font-size: 26px;
   cursor: pointer;
+  z-index: 1001;
 }
 
 /* MOBILE */
@@ -619,39 +620,50 @@ body {
     display: block;
   }
 
-  /* Hide desktop nav */
+  /* NAV WRAPPER */
   nav {
     position: absolute;
     top: 70px;
     left: 0;
     width: 100%;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(25px);
-    display: none;
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
   }
 
+  /* ACTIVE STATE */
   nav.active {
-    display: block;
+    max-height: 400px;
+    padding: 15px 0;
   }
 
+  /* NAV LINKS */
   .nav-links {
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    padding: 20px 0;
+    gap: 18px;
   }
 
+  .nav-links li a {
+    font-size: 16px;
+  }
+
+  /* RIGHT SIDE HIDE */
   .nav-right {
     display: none;
   }
 }
+/* ================= MOBILE AUTH ================= */
 
-/* MOBILE AUTH */
 .mobile-auth {
   display: none;
   text-align: center;
-  padding-bottom: 15px;
+  padding: 10px 0 15px;
 }
 
 .mobile-auth a {
@@ -689,4 +701,353 @@ body {
 /* Optional: improve link spacing */
 .mobile-auth a {
   padding: 8px 0;
+}
+
+/* ================= IMPROVED MOBILE NAVBAR ================= */
+
+@media (max-width: 768px) {
+
+  nav {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(25px);
+    display: none;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    animation: slideDown 0.3s ease;
+  }
+
+  nav.active {
+    display: block;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 20px 0;
+  }
+
+  .nav-links a {
+    font-size: 16px;
+  }
+
+}
+/* ================= HERO RESPONSIVE IMPROVEMENT ================= */
+
+@media (max-width: 768px) {
+  .hero {
+    height: auto;
+    padding: 80px 20px;
+  }
+
+  .hero-content-left {
+    max-width: 100%;
+  }
+
+  .hero-content-left p {
+    font-size: 1rem;
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ================= PROFILE DROPDOWN FIX ================= */
+
+@media (max-width: 768px) {
+
+  .profile-dropdown:hover .dropdown-content {
+    display: none; /* disable hover on mobile */
+  }
+
+}
+
+/* ================= SMALL SCREEN IMPROVEMENTS ================= */
+
+@media (max-width: 480px) {
+
+  .logo {
+    font-size: 22px;
+  }
+
+  .nav-container {
+    padding: 12px 15px;
+  }
+
+  .hero-title {
+    font-size: 1.7rem;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+}
+
+/* ================= BUTTON TOUCH IMPROVEMENT ================= */
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ================= SMOOTH TRANSITIONS ================= */
+
+.nav-links a,
+.login-btn,
+.profile-img {
+  transition: all 0.25s ease;
+}
+
+/* ================= FOOTER MOBILE IMPROVEMENT ================= */
+
+@media (max-width: 768px) {
+
+  .footer {
+    padding-top: 40px;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    text-align: center;
+  }
+
+  .footer-col {
+    padding: 10px 0;
+  }
+
+  .footer-logo {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .footer-col h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .footer-col p {
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  .footer-col ul li {
+    margin-bottom: 8px;
+  }
+
+  .footer-col ul li a {
+    font-size: 14px;
+  }
+
+  .footer-bottom {
+    margin-top: 30px;
+    font-size: 12px;
+    padding: 15px 0;
+  }
+
+}
+
+/* ================= SMALL MOBILE POLISH ================= */
+
+@media (max-width: 480px) {
+
+  .footer {
+    padding: 30px 15px 0;
+  }
+
+  .footer-container {
+    gap: 25px;
+  }
+
+  .footer-logo {
+    font-size: 22px;
+  }
+
+  .footer-col p {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+}
+
+/* ================= HERO MOBILE FIX ================= */
+
+@media (max-width: 768px) {
+
+  .hero {
+    height: auto;
+    padding: 80px 20px 40px;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .hero-content {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .hero h1 {
+    font-size: 26px;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+
+  .hero p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  /* BUTTON STACK FIX */
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hero-buttons a,
+  .hero-buttons button {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+/* ================= EXTRA SMALL DEVICES ================= */
+
+@media (max-width: 480px) {
+
+  .hero {
+    padding: 70px 15px 30px;
+  }
+
+  .hero h1 {
+    font-size: 22px;
+    white-space: normal;
+    overflow: visible;
+  }
+
+  .hero p {
+    font-size: 13px;
+  }
+
+  .hero-buttons a,
+  .hero-buttons button {
+    padding: 11px;
+    font-size: 13px;
+  }
+}
+
+/* ================= PREMIUM MOBILE NAV ================= */
+
+.menu-toggle {
+  display: none;
+  width: 25px;
+  height: 18px;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.menu-toggle span {
+  height: 3px;
+  background: #333;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  nav {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(25px);
+    transform: translateY(-20px);
+    opacity: 0;
+    pointer-events: none;
+
+    transition: all 0.3s ease;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  }
+
+  nav.active {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 25px 0;
+  }
+
+  .nav-links a {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .nav-right {
+    display: none;
+  }
+
+  /* AUTH */
+  .mobile-auth {
+    display: block;
+    text-align: center;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+    padding-top: 15px;
+  }
+}
+
+/* HAMBURGER ANIMATION */
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translateY(7px);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translateY(-7px);
 }

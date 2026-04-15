@@ -1,4 +1,4 @@
-<?php
+<?php 
 require_once("includes/config.php");
 
 // ✅ Safe session start
@@ -40,6 +40,8 @@ include("includes/header.php");
 <head>
     <title>Book Room - HotelLux</title>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     <style>
         body {
             font-family: 'Segoe UI';
@@ -51,7 +53,7 @@ include("includes/header.php");
             display: grid;
             grid-template-columns: 1.2fr 1fr;
             gap: 40px;
-            padding: 60px;
+            padding: 40px;
         }
 
         .room-preview {
@@ -106,6 +108,7 @@ include("includes/header.php");
             box-shadow: 0 15px 40px rgba(0,0,0,0.08);
             position: sticky;
             top: 100px;
+            overflow: visible;
         }
 
         .booking-card h2 {
@@ -130,6 +133,8 @@ include("includes/header.php");
             border-radius: 8px;
             border: 1px solid #ddd;
             outline: none;
+            width: 100%;
+            max-width: 100%;
         }
 
         .input-group input:focus,
@@ -169,6 +174,22 @@ include("includes/header.php");
             font-weight: bold;
         }
 
+        /* 🔥 ONLY ADDITION */
+        @media (max-width: 768px) {
+            .input-group {
+                position: relative;
+            }
+
+            .input-group select {
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                background: white;
+                font-size: 16px;
+            }
+        }
+
+        /* YOUR EXISTING MEDIA QUERIES UNCHANGED */
         @media (max-width: 768px) {
             .booking-container {
                 grid-template-columns: 1fr;
@@ -192,6 +213,17 @@ include("includes/header.php");
             .pay-btn {
                 font-size: 14px;
                 padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .booking-container {
+                padding: 15px 10px !important;
+            }
+
+            .booking-card {
+                padding: 15px;
+                width: 100%;
             }
         }
     </style>
@@ -224,31 +256,22 @@ if (isset($_GET['success']) && isset($_SESSION['user_email'])) {
 
 <div class="booking-container">
 
-    <!-- LEFT -->
     <div class="room-preview">
-
-        <!-- ✅ FIXED IMAGE -->
         <img src="/hotel-booking/<?php echo htmlspecialchars($room['image']); ?>" alt="room">
-
         <div class="room-details">
             <h2><?php echo htmlspecialchars($room['name']); ?></h2>
-
             <p class="location">HotelLux, Ahmedabad</p>
             <p class="features">WiFi • AC • Breakfast</p>
-
             <div class="price-box">
                 ₹<?php echo htmlspecialchars($room['price']); ?> <span>/ night</span>
             </div>
         </div>
     </div>
 
-    <!-- RIGHT -->
     <div class="booking-card">
-
         <h2>Complete Your Booking</h2>
 
         <form id="bookingForm">
-
             <input type="hidden" name="room_id" value="<?php echo $room['id']; ?>">
             <input type="hidden" name="amount" value="<?php echo $room['price']; ?>">
 
@@ -265,12 +288,12 @@ if (isset($_GET['success']) && isset($_SESSION['user_email'])) {
             <div class="input-row">
                 <div class="input-group">
                     <label>Check-in</label>
-                    <input type="date" name="check_in" required>
+                    <input type="text" id="check_in" name="check_in" required>
                 </div>
 
                 <div class="input-group">
                     <label>Check-out</label>
-                    <input type="date" name="check_out" required>
+                    <input type="text" id="check_out" name="check_out" required>
                 </div>
             </div>
 
@@ -288,14 +311,13 @@ if (isset($_GET['success']) && isset($_SESSION['user_email'])) {
             <button class="pay-btn" type="submit">
                 Proceed to Payment →
             </button>
-
         </form>
-
     </div>
 
 </div>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="/hotel-booking/assets/js/script.js"></script>
 
 </body>
