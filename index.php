@@ -5,160 +5,191 @@ include("includes/header.php");
 $result = $conn->query("SELECT * FROM rooms LIMIT 8");
 ?>
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI';
-            background: #f4f6f9;
-        }
 
-        .container {
-            padding: 40px;
-        }
+/* ================= RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        .rooms {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-        }
+body {
+    font-family: 'Segoe UI', 'Inter', sans-serif;
+    background: #f6f7fb;
+    color: #1a1a1a;
+}
 
-        .card {
-            background: #fff;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            transition: 0.3s;
-            position: relative;
-        }
+/* ================= HERO ================= */
+.hero {
+    height: 90vh;
+    background: 
+        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+        url('assets/images/hotel.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    padding: 0 60px;
+}
 
-        .card:hover {
-            transform: translateY(-6px);
-        }
+.hero-content {
+    color: white;
+    max-width: 500px;
+}
 
-        .card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
 
-        .hot {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #ff4d6d;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-        }
-        
-        .content {
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+.hero p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
 
-        .bottom-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+}
 
-        .title {
-            font-size: 18px;
-            font-weight: 600;
-        }
+.btn-outline {
+    padding: 10px 18px;
+    border: 2px solid white;
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+}
 
-        .rating {
-            float: right;
-            color: orange;
-        }
+/* ================= ROOM SECTION ================= */
+.room-section {
+    background: #f6f7fb;
+    padding: 80px 0 100px;
+    position: relative;
+}
 
-        .info {
-            font-size: 13px;
-            color: gray;
-            margin-top: 5px;
-        }
+/* ================= HEADER ================= */
+.section-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
 
-        .price {
-            font-weight: bold;
-            margin-top: 10px;
-        }
+.section-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
 
-        .btn {
-            padding: 8px 14px;
-            background: #7b2cbf;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-        }
+.section-header p {
+    color: #6b7280;
+    font-size: 15px;
+}
 
-        .btn:hover {
-            background: #5a189a;
-        }
+/* ================= CONTAINER ================= */
+.container {
+    padding: 0 60px;
+}
 
-        .disabled {
-            background: gray;
-            pointer-events: none;
-        }
+/* ================= GRID ================= */
+.rooms {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+}
 
-        /* ================= HOMEPAGE MOBILE FIX ================= */
+/* ================= CARD ================= */
+.card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transition: 0.3s ease;
+    position: relative;
+}
 
-        @media (max-width: 768px) {
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
 
-        .container {
-            padding: 20px 15px !important;
-        }
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
 
-        .rooms {
-            grid-template-columns: 1fr !important;
-            gap: 20px;
-        }
+/* HOT */
+.hot {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: linear-gradient(135deg, #ff4d6d, #ff758f);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+}
 
-        .card {
-            border-radius: 12px;
-        }
+/* CONTENT */
+.content {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
-        .card img {
-            height: 200px;
-        }
+.title {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+}
 
-        .content {
-            padding: 12px;
-        }
+.rating {
+    color: #f59e0b;
+}
 
-        .title {
-            font-size: 16px;
-        }
+.info {
+    font-size: 13px;
+    color: #9ca3af;
+}
 
-        .price {
-            font-size: 16px;
-        }
+.bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .btn {
-            padding: 10px;
-            font-size: 14px;
-        }
+.price {
+    font-weight: 700;
+}
 
-        }
+/* BUTTON */
+.btn {
+    padding: 9px 16px;
+    background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+}
 
-        /* ================= EXTRA SMALL DEVICES ================= */
+.btn:hover {
+    box-shadow: 0 6px 14px rgba(123,44,191,0.3);
+}
 
-        @media (max-width: 480px) {
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
 
-        .container {
-            padding: 15px 10px !important;
-        }
+    .container {
+        padding: 0 15px;
+    }
 
-        .hero {
-            padding: 60px 15px;
-        }
+    .hero {
+        padding: 0 20px;
+        height: 70vh;
+    }
 
-        .hero-title {
-            font-size: 1.6rem;
-        }
-
-        }
+    .rooms {
+        grid-template-columns: 1fr;
+    }
+}
     </style>
 </head>
 
@@ -186,8 +217,15 @@ $result = $conn->query("SELECT * FROM rooms LIMIT 8");
 </section>
 
 <!-- ================= DYNAMIC ROOMS ================= -->
-<section class="container">
-    <div class="rooms">
+<section class="room-section">
+    <div class="container">
+
+        <div class="section-header">
+            <h2>Our Featured Rooms</h2>
+            <p>Handpicked stays for comfort, luxury, and unforgettable experience</p>
+        </div>
+
+        <div class="rooms">
 
         <?php while ($room = $result->fetch_assoc()): ?>
 
@@ -217,7 +255,7 @@ $result = $conn->query("SELECT * FROM rooms LIMIT 8");
                 <div class="content">
 
                     <div class="title">
-                        <?php echo htmlspecialchars($room['name']); ?>
+                        <span><?php echo htmlspecialchars($room['name']); ?></span>
                         <span class="rating">⭐ <?php echo htmlspecialchars($room['rating']); ?></span>
                     </div>
 
@@ -254,7 +292,7 @@ $result = $conn->query("SELECT * FROM rooms LIMIT 8");
             </div>
 
         <?php endwhile; ?>
-
+        </div>                          
     </div>
 </section>
 
