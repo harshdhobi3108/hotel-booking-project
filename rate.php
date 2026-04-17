@@ -3,68 +3,108 @@ require_once("includes/config.php");
 
 header('Content-Type: application/json');
 
-// ✅ SESSION
+/* ================= SESSION ================= */
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 🔐 AUTH
+/* ================= AUTH ================= */
+
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(["status" => "error", "message" => "Unauthorized"]);
+    echo json_encode([
+        "status"  => "error",
+        "message" => "Please login first."
+    ]);
     exit;
 }
 
-// ✅ GET DATA
+$user_id = (int) $_SESSION['user_id'];
+
+/* ================= INPUT ================= */
+
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (empty($data['order_id']) || empty($data['rating'])) {
-    echo json_encode(["status" => "error", "message" => "Missing data"]);
+if (!$data) {
+    echo json_encode([
+        "status"  => "error",
+        "message" => "Invalid request."
+    ]);
     exit;
 }
 
-$order_id = (int)$data['order_id'];
-$rating   = (int)$data['rating'];
-$user_id  = $_SESSION['user_id'];
+$order_id = isset($data['order_id']) ? (int) $data['order_id'] : 0;
+$rating   = isset($data['rating']) ? (int) $data['rating'] : 0;
 
-// ✅ VALIDATION
-if ($rating < 1 || $rating > 5) {
-    echo json_encode(["status" => "error", "message" => "Invalid rating"]);
+/* ================= VALIDATION ================= */
+
+if ($order_id <= 0 || $rating < 1 || $rating > 5) {
+    echo json_encode([
+        "status"  => "error",
+        "message" => "Please select a valid rating."
+    ]);
     exit;
 }
 
 try {
 
-    // 🔍 CHECK ORDER BELONGS TO USER
+    /* ================= CHECK ORDER OWNERSHIP ================= */
+
     $check = $conn->prepare("
-        SELECT id FROM orders 
+        SELECT id, rating, booking_status
+        FROM orders
         WHERE id = ? AND user_id = ?
+        LIMIT 1
     ");
+
     $check->bind_param("ii", $order_id, $user_id);
     $check->execute();
 
-    if ($check->get_result()->num_rows === 0) {
-        throw new Exception("Invalid order");
+    $result = $check->get_result();
+
+    if ($result->num_rows === 0) {
+        throw new Exception("Booking not found.");
     }
 
-    // ✅ UPDATE RATING
+    $order = $result->fetch_assoc();
+
+    /* ================= RULES ================= */
+
+    if ($order['booking_status'] === 'cancelled') {
+        throw new Exception("Cancelled booking cannot be rated.");
+    }
+
+    if (!empty($order['rating']) && $order['rating'] > 0) {
+        throw new Exception("You already rated this stay.");
+    }
+
+    /* ================= SAVE RATING ================= */
+
     $stmt = $conn->prepare("
-        UPDATE orders SET rating = ? WHERE id = ?
+        UPDATE orders
+        SET rating = ?
+        WHERE id = ?
     ");
+
     $stmt->bind_param("ii", $rating, $order_id);
 
     if (!$stmt->execute()) {
-        throw new Exception("DB update failed");
+        throw new Exception("Unable to save rating.");
     }
 
+    /* ================= SUCCESS ================= */
+
     echo json_encode([
-        "status" => "success",
-        "rating" => $rating
+        "status"  => "success",
+        "rating"  => $rating,
+        "message" => "Thanks for rating your stay ⭐"
     ]);
 
 } catch (Exception $e) {
 
     echo json_encode([
-        "status" => "error",
+        "status"  => "error",
         "message" => $e->getMessage()
     ]);
 }
+?>
