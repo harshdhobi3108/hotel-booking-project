@@ -66,9 +66,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 /* ================= DESKTOP NAV ================= */
-#navMenu{
-    margin-left:auto;
-}
 
 .nav-links{
     display:flex;
