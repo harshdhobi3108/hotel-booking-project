@@ -20,6 +20,10 @@ function sendHotelMail($to, $subject, $body, $attachmentPath = null)
         $mail->Password   = $_ENV['MAIL_PASSWORD'];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 
+        /* Performance */
+        $mail->Timeout = 30;
+        $mail->SMTPKeepAlive = false;
+
         /* Sender */
         $mail->setFrom(
             $_ENV['MAIL_FROM'],
@@ -27,6 +31,7 @@ function sendHotelMail($to, $subject, $body, $attachmentPath = null)
         );
 
         $mail->addAddress($to);
+
         $mail->addReplyTo(
             $_ENV['MAIL_FROM'],
             $_ENV['MAIL_FROM_NAME']
@@ -35,9 +40,10 @@ function sendHotelMail($to, $subject, $body, $attachmentPath = null)
         /* Content */
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
+
         $mail->Subject = $subject;
         $mail->Body    = $body;
-        $mail->AltBody = strip_tags($body);
+        $mail->AltBody = html_entity_decode(strip_tags($body));
 
         /* Attachment */
         if (!empty($attachmentPath) && file_exists($attachmentPath)) {
@@ -51,7 +57,11 @@ function sendHotelMail($to, $subject, $body, $attachmentPath = null)
 
         file_put_contents(
             __DIR__ . '/mail_error_log.txt',
-            date('Y-m-d H:i:s') . ' => ' . $mail->ErrorInfo . PHP_EOL,
+            date('Y-m-d H:i:s') .
+            ' | To: ' . $to .
+            ' | Subject: ' . $subject .
+            ' | Error: ' . $mail->ErrorInfo .
+            PHP_EOL,
             FILE_APPEND
         );
 

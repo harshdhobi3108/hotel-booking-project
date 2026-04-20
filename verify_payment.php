@@ -99,8 +99,6 @@ try {
     $order_id  = (int)$booking['order_id'];
     $user_id   = (int)$booking['user_id'];
     $room_id   = (int)$booking['room_id'];
-    $check_in  = $booking['check_in'];
-    $check_out = $booking['check_out'];
     $amount    = (float)$booking['amount'];
 
     /* ================= CONFIRM ORDER ================= */
@@ -153,12 +151,7 @@ try {
         VALUES (?, ?, ?, 'razorpay', 'paid')
     ");
 
-    $payInsert->bind_param(
-        "iid",
-        $order_id,
-        $user_id,
-        $amount
-    );
+    $payInsert->bind_param("iid", $order_id, $user_id, $amount);
 
     if (!$payInsert->execute()) {
         throw new Exception("Payment insert failed");
@@ -191,15 +184,90 @@ try {
 
     $subject = "Booking Confirmed - HotelLux";
 
-    $body = "
-    <h2>Hello {$order['user_name']}</h2>
-    <p>Your booking has been confirmed successfully.</p>
-    <p><strong>Booking ID:</strong> #{$order['id']}</p>
-    <p><strong>Room:</strong> {$order['room_name']}</p>
-    <p><strong>Check-in:</strong> {$order['booking_date']}</p>
-    <p><strong>Check-out:</strong> {$order['check_out']}</p>
-    <p><strong>Amount Paid:</strong> ₹" . number_format($amount,2) . "</p>
-    ";
+    $body = '
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Booking Confirmed</title>
+</head>
+
+<body style="margin:0;padding:0;background:#f4f5f7;font-family:Arial,Helvetica,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:30px 15px;background:#f4f5f7;">
+<tr>
+<td align="center">
+
+<table width="680" cellpadding="0" cellspacing="0" style="max-width:680px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 12px 35px rgba(0,0,0,0.08);">
+
+<tr>
+<td style="padding:38px 30px;background:linear-gradient(135deg,#6a11cb,#9b3fe4);text-align:center;color:#ffffff;">
+<h1 style="margin:0;font-size:38px;font-weight:700;">HotelLux</h1>
+<p style="margin:12px 0 0;font-size:16px;opacity:0.95;">Your Booking is Confirmed</p>
+</td>
+</tr>
+
+<tr>
+<td style="padding:35px 30px;color:#222;">
+
+<p style="font-size:22px;margin:0 0 20px;font-weight:700;">Hello '.$order['user_name'].'</p>
+
+<p style="font-size:15px;line-height:1.8;color:#555;margin:0 0 25px;">
+Thank you for choosing HotelLux. We are delighted to confirm your reservation.
+Your attached invoice is included with this email.
+</p>
+
+<table width="100%" cellpadding="14" cellspacing="0" style="border-collapse:collapse;border:1px solid #eeeeee;border-radius:10px;overflow:hidden;">
+
+<tr style="background:#fafafa;">
+<td style="font-weight:700;">Booking ID</td>
+<td>#'.$order['id'].'</td>
+</tr>
+
+<tr>
+<td style="font-weight:700;">Room</td>
+<td>'.$order['room_name'].'</td>
+</tr>
+
+<tr style="background:#fafafa;">
+<td style="font-weight:700;">Check-in</td>
+<td>'.$order['booking_date'].'</td>
+</tr>
+
+<tr>
+<td style="font-weight:700;">Check-out</td>
+<td>'.$order['check_out'].'</td>
+</tr>
+
+<tr style="background:#fafafa;">
+<td style="font-weight:700;">Amount Paid</td>
+<td style="font-weight:700;color:#16a34a;">₹'.number_format($amount,2).'</td>
+</tr>
+
+</table>
+
+<p style="margin:28px 0 0;font-size:14px;color:#666;line-height:1.7;">
+We look forward to welcoming you and making your stay memorable.
+</p>
+
+</td>
+</tr>
+
+<tr>
+<td style="background:#fafafa;padding:22px;text-align:center;color:#888;font-size:13px;">
+© 2026 HotelLux. All Rights Reserved.
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>';
 
     sendHotelMail($order['email'], $subject, $body, $invoicePath);
 
