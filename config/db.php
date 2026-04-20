@@ -4,7 +4,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db   = "hotel_booking";
+$db   = "hotel_booking_new";
 
 // ================= CREATE CONNECTION =================
 $conn = new mysqli($host, $user, $pass, $db);

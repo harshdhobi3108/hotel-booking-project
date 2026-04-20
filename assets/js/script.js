@@ -1,57 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ================= THEME TOGGLE ================= */
-  const toggleBtn = document.getElementById("theme-toggle");
-
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
-    document.body.classList.add("dark");
-  }
-
-  if (toggleBtn) {
-    updateToggleIcon();
-
-    toggleBtn.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-
-      const isDark = document.body.classList.contains("dark");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-
-      updateToggleIcon();
+  /* ================= SWEET ALERT HELPERS ================= */
+  const toast = (icon, title) => {
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: icon,
+      title: title,
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true
     });
-  }
+  };
 
-  function updateToggleIcon() {
-    if (!toggleBtn) return;
-
-    toggleBtn.innerHTML = document.body.classList.contains("dark")
-      ? "☀️"
-      : "🌙";
-  }
-
-  /* ================= MOBILE NAVBAR ================= */
-  const menuToggle = document.getElementById("menuToggle");
-  const navMenu = document.querySelector("nav");
-
-  if (menuToggle && navMenu) {
-
-    menuToggle.addEventListener("click", function (e) {
-      e.stopPropagation();
-      navMenu.classList.toggle("active");
+  const popup = (icon, title, text = "") => {
+    Swal.fire({
+      icon: icon,
+      title: title,
+      text: text,
+      confirmButtonColor: "#7b2cbf"
     });
+  };
 
-    document.querySelectorAll(".nav-links a").forEach(link => {
-      link.addEventListener("click", () => {
-        navMenu.classList.remove("active");
-      });
-    });
+  /* =====================================================
+     IMPORTANT FIX:
+     MOBILE NAVBAR CODE REMOVED
+     Navbar already handled in header.php
+     Duplicate listeners were breaking menu on other pages
+  ===================================================== */
 
-    document.addEventListener("click", function (e) {
-      if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
-        navMenu.classList.remove("active");
-      }
-    });
-  }
 
   /* ================= TYPEWRITER ================= */
   const typewriterElement = document.getElementById("typewriter");
@@ -70,17 +47,21 @@ document.addEventListener("DOMContentLoaded", () => {
     function typeEffect() {
       const currentText = texts[textIndex];
 
-      typewriterElement.textContent = currentText.substring(0, charIndex);
+      typewriterElement.textContent =
+        currentText.substring(0, charIndex);
 
       if (!isDeleting && charIndex < currentText.length) {
+
         charIndex++;
         setTimeout(typeEffect, 70);
 
       } else if (isDeleting && charIndex > 0) {
+
         charIndex--;
         setTimeout(typeEffect, 40);
 
       } else {
+
         isDeleting = !isDeleting;
 
         if (!isDeleting) {
@@ -94,11 +75,16 @@ document.addEventListener("DOMContentLoaded", () => {
     typeEffect();
   }
 
-  /* ================= ✅ FLATPICKR DATE LOGIC ================= */
+
+  /* ================= DATE PICKER ================= */
   const checkIn = document.getElementById("check_in");
   const checkOut = document.getElementById("check_out");
 
-  if (checkIn && checkOut && typeof flatpickr !== "undefined") {
+  if (
+    checkIn &&
+    checkOut &&
+    typeof flatpickr !== "undefined"
+  ) {
 
     const today = new Date();
 
@@ -107,110 +93,235 @@ document.addEventListener("DOMContentLoaded", () => {
       minDate: today
     });
 
-    const fpCheckIn = flatpickr(checkIn, {
+    flatpickr(checkIn, {
       dateFormat: "Y-m-d",
       minDate: today,
-      onChange: function(selectedDates, dateStr) {
+      onChange: function (selectedDates, dateStr) {
         fpCheckOut.set("minDate", dateStr);
       }
     });
-
   }
 
+
   /* ================= BOOKING FLOW ================= */
-  const bookingForm = document.getElementById("bookingForm");
+  const bookingForm =
+    document.getElementById("bookingForm");
 
   if (bookingForm) {
-    bookingForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
 
-      const room_id = document.querySelector('[name="room_id"]').value;
-      const check_in = document.querySelector('[name="check_in"]').value;
-      const check_out = document.querySelector('[name="check_out"]').value;
-      const time = document.querySelector('[name="time"]').value;
+    bookingForm.addEventListener(
+      "submit",
+      async function (e) {
 
-      if (!check_in || !check_out || !time) {
-        alert("Please fill all fields");
-        return;
-      }
+        e.preventDefault();
 
-      if (check_out <= check_in) {
-        alert("Check-out must be after check-in");
-        return;
-      }
+        const room_id =
+          document.querySelector('[name="room_id"]').value;
 
-      try {
-        const checkRes = await fetch("/hotel-booking/check_availability.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ room_id, check_in, check_out })
-        });
+        const check_in =
+          document.querySelector('[name="check_in"]').value;
 
-        const checkData = await checkRes.json();
+        const check_out =
+          document.querySelector('[name="check_out"]').value;
 
-        if (!checkData.available) {
-          alert("❌ Room already booked for selected dates!");
+        const time =
+          document.querySelector('[name="time"]').value;
+
+        if (!check_in || !check_out || !time) {
+          toast("warning", "Please fill all fields");
           return;
         }
 
-        const response = await fetch("/hotel-booking/create_order.php", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ room_id, check_in, check_out, time })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-          throw new Error(data.error || "Order creation failed");
+        if (check_out <= check_in) {
+          toast(
+            "warning",
+            "Check-out must be after check-in"
+          );
+          return;
         }
 
-        const options = {
-          key: "rzp_test_SahxQ39qIdVeKw",
-          amount: data.amount,
-          currency: "INR",
-          name: "HotelLux",
-          description: "Room Booking",
-          order_id: data.order_id,
+        try {
 
-          handler: async function (response) {
-            try {
-              const verifyRes = await fetch("/hotel-booking/verify_payment.php", {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature
-                })
-              });
-
-              const verifyData = await verifyRes.json();
-
-              if (!verifyRes.ok || verifyData.status !== "success") {
-                throw new Error(verifyData.message || "Verification failed");
-              }
-
-              alert("✅ Booking Confirmed!");
-              window.location.href = "/hotel-booking/my-bookings.php";
-
-            } catch (err) {
-              alert("❌ Payment successful but booking failed");
+          Swal.fire({
+            title: "Checking availability...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
             }
-          },
+          });
 
-          theme: { color: "#7b2cbf" }
-        };
+          const checkRes = await fetch(
+            "/hotel-booking/check_availability.php",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                room_id,
+                check_in,
+                check_out
+              })
+            }
+          );
 
-        const rzp = new Razorpay(options);
-        rzp.open();
+          const checkData =
+            await checkRes.json();
 
-      } catch (error) {
-        alert(error.message || "Something went wrong!");
+          if (!checkData.available) {
+
+            Swal.close();
+
+            popup(
+              "error",
+              "Room Unavailable",
+              "Already booked for selected dates."
+            );
+
+            return;
+          }
+
+          const response = await fetch(
+            "/hotel-booking/create_order.php",
+            {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                room_id,
+                check_in,
+                check_out,
+                time
+              })
+            }
+          );
+
+          const data = await response.json();
+
+          Swal.close();
+
+          if (!response.ok || data.error) {
+            throw new Error(
+              data.error ||
+              "Order creation failed"
+            );
+          }
+
+          const options = {
+
+            key: "rzp_test_SahxQ39qIdVeKw",
+            amount: data.amount,
+            currency: "INR",
+            name: "HotelLux",
+            description: "Room Booking",
+            order_id: data.order_id,
+
+            handler: async function (response) {
+
+              try {
+
+                Swal.fire({
+                  title: "Verifying payment...",
+                  allowOutsideClick: false,
+                  didOpen: () => {
+                    Swal.showLoading();
+                  }
+                });
+
+                const verifyRes = await fetch(
+                  "/hotel-booking/verify_payment.php",
+                  {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                      "Content-Type":
+                        "application/json"
+                    },
+                    body: JSON.stringify({
+                      razorpay_order_id:
+                        response.razorpay_order_id,
+
+                      razorpay_payment_id:
+                        response.razorpay_payment_id,
+
+                      razorpay_signature:
+                        response.razorpay_signature
+                    })
+                  }
+                );
+
+                const verifyData =
+                  await verifyRes.json();
+
+                Swal.close();
+
+                if (
+                  !verifyRes.ok ||
+                  verifyData.status !== "success"
+                ) {
+                  throw new Error(
+                    verifyData.message ||
+                    "Verification failed"
+                  );
+                }
+
+                await Swal.fire({
+                  icon: "success",
+                  title: "Booking Confirmed!",
+                  text:
+                    "Your room has been booked successfully.",
+                  confirmButtonColor:
+                    "#7b2cbf"
+                });
+
+                window.location.href =
+                  "/hotel-booking/my-bookings.php";
+
+              } catch (err) {
+
+                Swal.close();
+
+                popup(
+                  "error",
+                  "Payment Failed",
+                  err.message
+                );
+              }
+            },
+
+            modal: {
+              ondismiss: function () {
+                toast(
+                  "info",
+                  "Payment window closed"
+                );
+              }
+            },
+
+            theme: {
+              color: "#7b2cbf"
+            }
+          };
+
+          const rzp =
+            new Razorpay(options);
+
+          rzp.open();
+
+        } catch (error) {
+
+          Swal.close();
+
+          popup(
+            "error",
+            "Something went wrong",
+            error.message || "Try again."
+          );
+        }
       }
-    });
+    );
   }
 
 });

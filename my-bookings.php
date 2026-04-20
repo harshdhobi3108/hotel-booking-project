@@ -584,9 +584,9 @@ onerror="this.src='uploads/rooms/Standard-Room.jpg';">
 </a>
 
 <?php if($status == 'confirmed'): ?>
-<a href="cancel_booking.php?id=<?php echo $row['id']; ?>" 
-class="btn btn-danger"
-onclick="return confirm('Are you sure you want to cancel this booking?')">
+<a href="javascript:void(0)"
+class="btn btn-danger cancel-booking-btn"
+data-id="<?php echo $row['id']; ?>">
 <i class="fa-solid fa-xmark"></i> Cancel
 </a>
 <?php endif; ?>
@@ -647,33 +647,67 @@ Browse Rooms
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-    function showToast(msg) {
-        const toast = document.createElement("div");
-        toast.innerText = msg;
-
-        toast.style.position = "fixed";
-        toast.style.top = "20px";
-        toast.style.right = "20px";
-        toast.style.background = "#7b2cbf";
-        toast.style.color = "#fff";
-        toast.style.padding = "12px 18px";
-        toast.style.borderRadius = "12px";
-        toast.style.zIndex = "9999";
-        toast.style.fontWeight = "600";
-
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.remove();
-        }, 2500);
+    function showToast(msg, icon = "success") {
+        Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: icon,
+            title: msg,
+            showConfirmButton: false,
+            timer: 2200,
+            timerProgressBar: true
+        });
     }
+
+    /* ================= CANCEL BOOKING ================= */
+
+    document.querySelectorAll(".cancel-booking-btn").forEach(btn => {
+
+        btn.addEventListener("click", function () {
+
+            const bookingId = this.dataset.id;
+
+            Swal.fire({
+                title: "Cancel Booking?",
+                text: "This action cannot be undone.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#ef4444",
+                cancelButtonColor: "#6b7280",
+                confirmButtonText: "Yes, Cancel",
+                cancelButtonText: "Keep Booking",
+                reverseButtons: true,
+                borderRadius: "18px"
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    Swal.fire({
+                        title: "Cancelling...",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    window.location.href =
+                        "cancel_booking.php?id=" + bookingId;
+                }
+
+            });
+
+        });
+
+    });
+
+    /* ================= RATING ================= */
 
     document.querySelectorAll(".ajax-rating").forEach(box => {
 
         const stars = box.querySelectorAll("span");
         const orderId = box.dataset.id;
 
-        stars.forEach((star, index) => {
+        stars.forEach(star => {
 
             star.addEventListener("click", async () => {
 
@@ -681,14 +715,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 stars.forEach(s => s.style.color = "#ddd");
 
-                for(let i=0; i<rating; i++){
+                for (let i = 0; i < rating; i++) {
                     stars[i].style.color = "#facc15";
                 }
 
                 const res = await fetch("rate.php", {
                     method: "POST",
                     headers: {
-                        "Content-Type":"application/json"
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         order_id: orderId,
@@ -698,9 +732,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const data = await res.json();
 
-                showToast(data.message);
+                showToast(data.message,
+                    data.status === "success" ? "success" : "error"
+                );
 
-                if(data.status === "success"){
+                if (data.status === "success") {
                     setTimeout(() => location.reload(), 1200);
                 }
 

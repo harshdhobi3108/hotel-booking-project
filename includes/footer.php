@@ -22,9 +22,9 @@
     <div class="footer-col">
       <h3>Support</h3>
       <ul>
-        <li><a href="faq.php">FAQs</a></li>
-        <li><a href="privacy.php">Privacy Policy</a></li>
-        <li><a href="terms.php">Terms & Conditions</a></li>
+        <li><a href="/hotel-booking/faq.php">FAQs</a></li>
+        <li><a href="/hotel-booking/privacy.php">Privacy Policy</a></li>
+        <li><a href="/hotel-booking/terms.php">Terms & Conditions</a></li>
       </ul>
     </div>
 
@@ -43,3 +43,20 @@
     <p>© 2026 HotelLux. All rights reserved.</p>
   </div>
 </footer>
+
+<!-- ================= GLOBAL JS LOAD ORDER ================= -->
+
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- Flatpickr -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<!-- SweetAlert2 (IMPORTANT: BEFORE script.js) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Main JS -->
+<script src="/hotel-booking/assets/js/script.js"></script>
+
+</body>
+</html>

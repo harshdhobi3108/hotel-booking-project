@@ -26,7 +26,7 @@ if (session_status() === PHP_SESSION_NONE) {
 define('DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
 define('DB_USER', $_ENV['DB_USER'] ?? 'root');
 define('DB_PASS', $_ENV['DB_PASS'] ?? '');
-define('DB_NAME', $_ENV['DB_NAME'] ?? 'hotel_booking');
+define('DB_NAME', $_ENV['DB_NAME'] ?? 'hotel_booking_new');
 
 // ================= DATABASE CONNECTION =================
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);

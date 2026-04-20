@@ -1,7 +1,6 @@
 <?php
 require_once("includes/config.php");
 
-// ================= SORT FEATURE (ADDED) =================
 $sort = $_GET['sort'] ?? '';
 
 $query = "SELECT * FROM rooms";
@@ -18,11 +17,6 @@ $result = $conn->query($query);
 
 include("includes/header.php");
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Rooms - HotelLux</title>
 
     <style>
 /* ================= RESET ================= */
@@ -237,10 +231,7 @@ body {
         font-size: 24px;
     }
 }
-    </style>
-</head>
-
-<body>
+</style>
 
 <div class="page-content">
 <div class="container">
@@ -271,10 +262,10 @@ body {
             <?php
             // ================= BOOKING CHECK =================
             $check = $conn->prepare("
-                SELECT id FROM orders 
-                WHERE room_id = ? 
-                AND booking_date = CURDATE() 
-                AND status = 'confirmed'
+            SELECT id FROM orders
+            WHERE room_id = ?
+            AND CURDATE() BETWEEN booking_date AND check_out
+            AND booking_status = 'confirmed'
             ");
             $check->bind_param("i", $room['id']);
             $check->execute();
@@ -348,8 +339,5 @@ body {
     </div>
 </div>
 </div>
-
-</body>
-</html>
 
 <?php include 'includes/footer.php'; ?>

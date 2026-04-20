@@ -29,7 +29,7 @@ $query = "
         o.booking_date,
         o.check_out,
         o.amount,
-        o.status,
+        o.payment_method,
         o.booking_status,
         o.cancelled_at
     FROM orders o
@@ -312,9 +312,9 @@ if (!$result) {
     <td>₹<?= number_format($row['amount']) ?></td>
 
     <td>
-        <?php if ($row['status'] == 'confirmed'): ?>
+        <?php if ($row['payment_method'] == 'confirmed'): ?>
             <span class="badge payment-confirmed">Paid</span>
-        <?php elseif ($row['status'] == 'pending'): ?>
+        <?php elseif ($row['payment_method'] == 'pending'): ?>
             <span class="badge payment-pending">Pending</span>
         <?php else: ?>
             <span class="badge payment-failed">Failed</span>

@@ -231,10 +231,10 @@ body {
 
             <?php
             $check = $conn->prepare("
-                SELECT id FROM orders 
-                WHERE room_id = ? 
-                AND booking_date = CURDATE() 
-                AND status = 'confirmed'
+            SELECT id FROM orders
+            WHERE room_id = ?
+            AND CURDATE() BETWEEN booking_date AND check_out
+            AND booking_status = 'confirmed'
             ");
             $check->bind_param("i", $room['id']);
             $check->execute();

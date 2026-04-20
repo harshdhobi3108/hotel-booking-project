@@ -4,79 +4,42 @@ require_once(__DIR__ . '/includes/config.php');
 
 use Razorpay\Api\Api;
 
-/*
-|--------------------------------------------------------------------------
-| HotelLux - create_order.php (Updated Production Version)
-|--------------------------------------------------------------------------
-| Improvements:
-| ✅ Better validation
-| ✅ Prevent duplicate pending bookings
-| ✅ Stronger overlap check
-| ✅ Secure transaction flow
-| ✅ Cleaner responses
-| ✅ Ready for verify_payment.php email flow
-|--------------------------------------------------------------------------
-*/
-
 header('Content-Type: application/json');
-error_reporting(0);
-ini_set('display_errors', 0);
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-/* ================= AUTH ================= */
+/* ================= SESSION SUPPORT (ALL LOGIN TYPES) ================= */
+$user_id = $_SESSION['user_id'] ?? $_SESSION['id'] ?? 0;
+$name    = $_SESSION['user_name'] ?? $_SESSION['name'] ?? $_SESSION['user'] ?? '';
+$email   = $_SESSION['user_email'] ?? $_SESSION['email'] ?? '';
 
-if (!isset($_SESSION['user_id'])) {
+/* ================= DEBUG SESSION ================= */
+if (!$user_id || empty($email)) {
     echo json_encode([
-        "error" => "Unauthorized"
+        "error"   => "Session expired",
+        "session" => $_SESSION
     ]);
     exit;
 }
 
 /* ================= INPUT ================= */
-
 $data = json_decode(file_get_contents("php://input"), true);
 
-$room_id   = (int) ($data['room_id'] ?? 0);
-$check_in  = trim($data['check_in'] ?? '');
-$check_out = trim($data['check_out'] ?? '');
-$time      = trim($data['time'] ?? '');
+$room_id   = (int)($data['room_id'] ?? 0);
+$check_in  = $data['check_in'] ?? '';
+$check_out = $data['check_out'] ?? '';
+$time      = $data['time'] ?? '';
 
 if (!$room_id || !$check_in || !$check_out || !$time) {
     echo json_encode([
-        "error" => "Missing booking details"
+        "error" => "Missing fields"
     ]);
     exit;
 }
 
-/* ================= DATE VALIDATION ================= */
-
-$today = date("Y-m-d");
-
-if ($check_in < $today) {
-    echo json_encode([
-        "error" => "Check-in cannot be in the past"
-    ]);
-    exit;
-}
-
-if ($check_out <= $check_in) {
-    echo json_encode([
-        "error" => "Invalid check-out date"
-    ]);
-    exit;
-}
-
-/* ================= USER SESSION ================= */
-
-$user_id = (int) $_SESSION['user_id'];
-$name    = $_SESSION['user_name'];
-$email   = $_SESSION['user_email'];
-
-/* ================= ROOM FETCH ================= */
-
+/* ================= ROOM DETAILS ================= */
 $stmt = $conn->prepare("
     SELECT id, name, price
     FROM rooms
@@ -97,57 +60,20 @@ if (!$room) {
 }
 
 /* ================= PRICE CALCULATION ================= */
+$nights = max(
+    1,
+    (strtotime($check_out) - strtotime($check_in)) / 86400
+);
 
-$price_per_night = (float) $room['price'];
+$total_amount = $room['price'] * $nights;
+$amount_paise = $total_amount * 100;
 
-$nights = (strtotime($check_out) - strtotime($check_in)) / 86400;
-$nights = max(1, (int) $nights);
-
-$total_amount = $price_per_night * $nights;
-$amount_paise = (int) round($total_amount * 100);
-
-/* ================= CLEAN OLD PENDING BOOKINGS ================= */
-
-$cleanup = $conn->prepare("
-    UPDATE orders
-    SET status = 'failed'
-    WHERE status = 'pending'
-    AND payment_id IS NULL
-    AND created_at < NOW() - INTERVAL 10 MINUTE
-");
-
-$cleanup->execute();
-
-/* ================= PREVENT SAME USER DUPLICATE PENDING ================= */
-
-$pending = $conn->prepare("
-    SELECT id
-    FROM orders
-    WHERE user_id = ?
-    AND room_id = ?
-    AND status = 'pending'
-    AND created_at > NOW() - INTERVAL 10 MINUTE
-    LIMIT 1
-");
-
-$pending->bind_param("ii", $user_id, $room_id);
-$pending->execute();
-
-if ($pending->get_result()->num_rows > 0) {
-    echo json_encode([
-        "error" => "Payment already initiated. Please complete previous payment."
-    ]);
-    exit;
-}
-
-/* ================= ROOM OVERLAP CHECK ================= */
-
+/* ================= AVAILABILITY CHECK ================= */
 $check = $conn->prepare("
     SELECT id
     FROM orders
     WHERE room_id = ?
-    AND status = 'confirmed'
-    AND payment_id IS NOT NULL
+    AND booking_status = 'confirmed'
     AND (
         booking_date < ?
         AND check_out > ?
@@ -160,99 +86,85 @@ $check->execute();
 
 if ($check->get_result()->num_rows > 0) {
     echo json_encode([
-        "error" => "Room already booked for selected dates"
+        "error" => "Room already booked"
     ]);
     exit;
 }
 
-/* ================= TRANSACTION ================= */
+/* ================= RAZORPAY ORDER ================= */
+$api = new Api(
+    $razorpay['key_id'],
+    $razorpay['secret']
+);
 
-$conn->begin_transaction();
+$receipt = "HLX_" . time() . "_" . $user_id;
 
-try {
+$order = $api->order->create([
+    'receipt'  => $receipt,
+    'amount'   => $amount_paise,
+    'currency' => 'INR'
+]);
 
-    /* ================= RAZORPAY ORDER ================= */
+$razor_order_id = $order['id'];
 
-    $api = new Api($razorpay['key_id'], $razorpay['secret']);
+/* ================= INSERT PENDING BOOKING ================= */
+$insert = $conn->prepare("
+    INSERT INTO orders
+    (
+        user_id,
+        user_name,
+        email,
+        room_id,
+        booking_date,
+        check_out,
+        booking_time,
+        amount,
+        payment_method,
+        booking_status
+    )
+    VALUES
+    (
+        ?, ?, ?, ?, ?, ?, ?, ?, 'razorpay', 'pending'
+    )
+");
 
-    $receipt = "HLX_" . time() . "_" . $user_id;
+$insert->bind_param(
+    "ississsd",
+    $user_id,
+    $name,
+    $email,
+    $room_id,
+    $check_in,
+    $check_out,
+    $time,
+    $total_amount
+);
 
-    $order = $api->order->create([
-        'receipt'  => $receipt,
-        'amount'   => $amount_paise,
-        'currency' => 'INR'
-    ]);
-
-    $order_id = $order['id'];
-
-    /* ================= SESSION STORE ================= */
-
-    $_SESSION['booking'] = [
-        'user_id'            => $user_id,
-        'room_id'            => $room_id,
-        'room_name'          => $room['name'],
-        'check_in'           => $check_in,
-        'check_out'          => $check_out,
-        'time'               => $time,
-        'amount'             => $total_amount,
-        'razorpay_order_id'  => $order_id
-    ];
-
-    /* ================= INSERT ORDER ================= */
-
-    $insert = $conn->prepare("
-        INSERT INTO orders
-        (
-            user_id,
-            user_name,
-            email,
-            room_id,
-            booking_date,
-            check_out,
-            booking_time,
-            amount,
-            razorpay_order_id,
-            receipt,
-            status
-        )
-        VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-    ");
-
-    $insert->bind_param(
-        "ississsiss",
-        $user_id,
-        $name,
-        $email,
-        $room_id,
-        $check_in,
-        $check_out,
-        $time,
-        $total_amount,
-        $order_id,
-        $receipt
-    );
-
-    if (!$insert->execute()) {
-        throw new Exception("Unable to create booking");
-    }
-
-    $conn->commit();
-
+if (!$insert->execute()) {
     echo json_encode([
-        "success"  => true,
-        "order_id" => $order_id,
-        "amount"   => $amount_paise,
-        "name"     => $name,
-        "email"    => $email,
-        "room"     => $room['name']
+        "error" => "Booking insert failed"
     ]);
-
-} catch (Exception $e) {
-
-    $conn->rollback();
-
-    echo json_encode([
-        "error" => $e->getMessage()
-    ]);
+    exit;
 }
+
+/* ================= SAVE BOOKING SESSION (IMPORTANT FIX) ================= */
+$_SESSION['booking'] = [
+    'order_id'         => $insert->insert_id,
+    'razorpay_order_id'=> $razor_order_id,
+    'user_id'          => $user_id,
+    'room_id'          => $room_id,
+    'check_in'         => $check_in,
+    'check_out'        => $check_out,
+    'time'             => $time,
+    'amount'           => $total_amount,
+    'email'            => $email,
+    'name'             => $name
+];
+
+/* ================= SUCCESS RESPONSE ================= */
+echo json_encode([
+    "success"  => true,
+    "order_id" => $razor_order_id,
+    "amount"   => $amount_paise
+]);
+?>

@@ -5,20 +5,27 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/* ================= LOGIN CHECK ================= */
 if (!isset($_SESSION['user_email'])) {
     header("Location: auth/login.php");
     exit();
 }
 
-if (!isset($_GET['id'])) {
+/* ================= VALID REQUEST ================= */
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("Invalid Request");
 }
 
-$order_id = intval($_GET['id']);
+$order_id = (int) $_GET['id'];
 
 /* ================= GET BOOKING ================= */
+$stmt = $conn->prepare("
+    SELECT *
+    FROM orders
+    WHERE id = ?
+    LIMIT 1
+");
 
-$stmt = $conn->prepare("SELECT * FROM orders WHERE id = ? LIMIT 1");
 $stmt->bind_param("i", $order_id);
 $stmt->execute();
 
@@ -31,37 +38,29 @@ if ($result->num_rows === 0) {
 $order = $result->fetch_assoc();
 
 /* ================= SECURITY CHECK ================= */
-
 if ($order['email'] !== $_SESSION['user_email']) {
     die("Unauthorized access");
 }
 
 /* ================= ALREADY CANCELLED ================= */
-
 if ($order['booking_status'] === 'cancelled') {
-    die("Already Cancelled");
+    die("Booking already cancelled");
 }
 
-/* ================= DATE LOGIC ================= */
-
+/* ================= DATE CHECK ================= */
 $checkin_datetime = $order['booking_date'] . ' ' . $order['booking_time'];
 
-$checkin = strtotime($checkin_datetime);
-$now = time();
+$checkin_time = strtotime($checkin_datetime);
+$current_time = time();
 
-$hours_before_checkin = ($checkin - $now) / 3600;
-
-/* ================= PRICE ================= */
-
-$price = (float) $order['amount'];
-
-/* ================= VALIDATION ================= */
+$hours_before_checkin = ($checkin_time - $current_time) / 3600;
 
 if ($hours_before_checkin <= 0) {
-    die("Cannot cancel after check-in date");
+    die("Cannot cancel after check-in time");
 }
 
-/* ================= REFUND LOGIC ================= */
+/* ================= REFUND CALCULATION ================= */
+$price = (float)$order['amount'];
 
 if ($hours_before_checkin > 48) {
     $refund = $price;
@@ -75,12 +74,12 @@ if ($hours_before_checkin > 48) {
 
 $refund = round($refund, 2);
 
-/* ================= TRANSACTION ================= */
-
+/* ================= START TRANSACTION ================= */
 $conn->begin_transaction();
 
 try {
 
+    /* ================= UPDATE BOOKING ================= */
     $update = $conn->prepare("
         UPDATE orders
         SET booking_status = 'cancelled',
@@ -90,65 +89,36 @@ try {
     ");
 
     $update->bind_param("di", $refund, $order_id);
-    $update->execute();
 
-    /* ================= EMAIL ================= */
+    if (!$update->execute()) {
+        throw new Exception("Cancel update failed");
+    }
 
-    $toEmail = $order['email'];
+    /* ================= SEND EMAIL ================= */
+    require_once("mailer.php");
 
-    // FIXED NAME ISSUE
     $customerName = !empty($order['user_name'])
         ? $order['user_name']
-        : (!empty($order['full_name']) ? $order['full_name'] : 'Guest');
+        : 'Guest';
 
     $subject = "Booking Cancelled - HotelLux";
 
-    $headers  = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8\r\n";
-    $headers .= "From: HotelLux <noreply@hotellux.com>\r\n";
-
     $message = '
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Booking Cancelled</title>
-    </head>
-
-    <body style="margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif;">
-
-        <div style="max-width:650px;margin:30px auto;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
-
-            <div style="background:linear-gradient(135deg,#7b2cbf,#5a189a);padding:28px;text-align:center;color:#fff;">
-                <h1 style="margin:0;font-size:28px;">HotelLux</h1>
-                <p style="margin:8px 0 0;">Booking Cancellation Confirmation</p>
+    <div style="font-family:Arial;padding:25px;background:#f8f9fc;">
+        <div style="max-width:650px;margin:auto;background:#fff;border-radius:14px;overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#6a11cb,#8e2de2);padding:25px;text-align:center;color:#fff;">
+                <h1 style="margin:0;">HotelLux</h1>
+                <p>Booking Cancelled Successfully</p>
             </div>
 
-            <div style="padding:30px;color:#222;">
+            <div style="padding:25px;">
+                <p>Hello <strong>' . $customerName . '</strong>,</p>
+                <p>Your booking has been cancelled successfully.</p>
 
-                <p style="font-size:16px;">
-                    Hello <strong>' . htmlspecialchars($customerName) . '</strong>,
-                </p>
-
-                <p style="font-size:15px;line-height:1.7;">
-                    Your booking has been successfully cancelled.
-                </p>
-
-                <table style="width:100%;border-collapse:collapse;margin-top:18px;">
-
+                <table style="width:100%;border-collapse:collapse;margin-top:20px;">
                     <tr>
                         <td style="padding:10px;border-bottom:1px solid #eee;"><strong>Booking ID</strong></td>
                         <td style="padding:10px;border-bottom:1px solid #eee;">#' . $order_id . '</td>
-                    </tr>
-
-                    <tr>
-                        <td style="padding:10px;border-bottom:1px solid #eee;"><strong>Check-in Date</strong></td>
-                        <td style="padding:10px;border-bottom:1px solid #eee;">' . htmlspecialchars($order['booking_date']) . '</td>
-                    </tr>
-
-                    <tr>
-                        <td style="padding:10px;border-bottom:1px solid #eee;"><strong>Check-in Time</strong></td>
-                        <td style="padding:10px;border-bottom:1px solid #eee;">' . htmlspecialchars($order['booking_time']) . '</td>
                     </tr>
 
                     <tr>
@@ -157,35 +127,26 @@ try {
                     </tr>
 
                     <tr>
-                        <td style="padding:10px;border-bottom:1px solid #eee;color:#16a34a;font-weight:bold;"><strong>Refund Amount</strong></td>
-                        <td style="padding:10px;border-bottom:1px solid #eee;color:#16a34a;font-weight:bold;">₹' . number_format($refund, 2) . '</td>
+                        <td style="padding:10px;border-bottom:1px solid #eee;color:green;"><strong>Refund Amount</strong></td>
+                        <td style="padding:10px;border-bottom:1px solid #eee;color:green;">₹' . number_format($refund, 2) . '</td>
                     </tr>
-
                 </table>
 
-                <p style="margin-top:22px;font-size:14px;line-height:1.7;color:#555;">
-                    Refund will be processed based on your payment method within 5-7 working days.
+                <p style="margin-top:20px;color:#666;">
+                    Refund will be processed within 5-7 working days.
                 </p>
-
-                <p style="margin-top:18px;font-size:14px;color:#555;">
-                    Need help? Contact our support team anytime.
-                </p>
-
             </div>
 
-            <div style="background:#f8f8f8;padding:18px;text-align:center;font-size:13px;color:#666;">
-                © 2026 HotelLux. All rights reserved.
+            <div style="background:#f4f4f4;padding:15px;text-align:center;color:#666;">
+                © 2026 HotelLux
             </div>
-
         </div>
-
-    </body>
-    </html>
+    </div>
     ';
 
-    require_once 'mailer.php';
-    sendHotelMail($toEmail, $subject, $message);
+    sendHotelMail($order['email'], $subject, $message);
 
+    /* ================= COMMIT ================= */
     $conn->commit();
 
     header("Location: profile.php?msg=cancel_success");
@@ -194,6 +155,7 @@ try {
 } catch (Exception $e) {
 
     $conn->rollback();
-    die("Something went wrong");
+
+    die("Something went wrong: " . $e->getMessage());
 }
 ?>

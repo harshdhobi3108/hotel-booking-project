@@ -237,7 +237,7 @@ $showSuccess = false;
 if (isset($_GET['success']) && isset($_SESSION['user_email'])) {
     $email = $_SESSION['user_email'];
 
-    $stmt = $conn->prepare("SELECT * FROM orders WHERE user_email = ? ORDER BY id DESC LIMIT 1");
+    $stmt = $conn->prepare("SELECT * FROM orders WHERE email = ? ORDER BY id DESC LIMIT 1");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();

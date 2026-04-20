@@ -5,76 +5,55 @@ use PHPMailer\PHPMailer\Exception;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-/*
-|--------------------------------------------------------------------------
-| HotelLux - mailer.php (Updated Production Version)
-|--------------------------------------------------------------------------
-| Features:
-| ✅ Secure SMTP setup
-| ✅ Better error handling
-| ✅ HTML email support
-| ✅ Attachment support
-| ✅ Reusable function
-|--------------------------------------------------------------------------
-*/
-
-/*
-|--------------------------------------------------------------------------
-| IMPORTANT
-|--------------------------------------------------------------------------
-| Replace these with your real Gmail details
-| Use Gmail App Password (not normal password)
-|--------------------------------------------------------------------------
-*/
-
 function sendHotelMail($to, $subject, $body, $attachmentPath = null)
 {
     try {
 
         $mail = new PHPMailer(true);
 
-        /* ================= SMTP ================= */
-
+        /* SMTP */
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
+        $mail->Host       = $_ENV['MAIL_HOST'];
+        $mail->Port       = (int) $_ENV['MAIL_PORT'];
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'harshdhobi31@gmail.com';
-        $mail->Password   = 'usuh xaur xhxb qeul';
+        $mail->Username   = $_ENV['MAIL_USERNAME'];
+        $mail->Password   = $_ENV['MAIL_PASSWORD'];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
 
-        /* ================= MAIL INFO ================= */
+        /* Sender */
+        $mail->setFrom(
+            $_ENV['MAIL_FROM'],
+            $_ENV['MAIL_FROM_NAME']
+        );
 
-        $mail->setFrom('harshdhobi31@gmail.com', 'HotelLux');
         $mail->addAddress($to);
+        $mail->addReplyTo(
+            $_ENV['MAIL_FROM'],
+            $_ENV['MAIL_FROM_NAME']
+        );
 
-        $mail->addReplyTo('harshdhobi31@gmail.com', 'HotelLux Support');
-
-        /* ================= CONTENT ================= */
-
+        /* Content */
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
-
         $mail->Subject = $subject;
         $mail->Body    = $body;
-
         $mail->AltBody = strip_tags($body);
 
-        /* ================= ATTACHMENT ================= */
-
+        /* Attachment */
         if (!empty($attachmentPath) && file_exists($attachmentPath)) {
             $mail->addAttachment($attachmentPath);
         }
 
-        /* ================= SEND ================= */
-
         $mail->send();
-
         return true;
 
     } catch (Exception $e) {
 
-        error_log("Mail Error: " . $mail->ErrorInfo);
+        file_put_contents(
+            __DIR__ . '/mail_error_log.txt',
+            date('Y-m-d H:i:s') . ' => ' . $mail->ErrorInfo . PHP_EOL,
+            FILE_APPEND
+        );
 
         return false;
     }
