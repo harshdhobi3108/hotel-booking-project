@@ -1,10 +1,10 @@
 <?php
 
 // ================= DATABASE CONFIG =================
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "hotel_booking_new";
+$host = "sql203.infinityfree.com";
+$user = "if0_43513445";
+$pass = "kYAouxrb9dky5j";
+$db   = "if0_43513445_hotellux";
 
 // ================= CREATE CONNECTION =================
 $conn = new mysqli($host, $user, $pass, $db);
