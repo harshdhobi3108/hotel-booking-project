@@ -1,25 +1,27 @@
+
 <?php
 
-// ================= DATABASE CONFIG =================
-$host = "sql203.infinityfree.com";
-$user = "if0_43513445";
-$pass = "kYAouxrb9dky5j";
-$db   = "if0_43513445_hotellux";
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// ================= CREATE CONNECTION =================
-$conn = new mysqli($host, $user, $pass, $db);
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
 
-// ================= ERROR HANDLING =================
-if ($conn->connect_error) {
-    die("❌ Database Connection Failed: " . $conn->connect_error);
+$host = $_ENV['DB_HOST'] ?? '';
+$user = $_ENV['DB_USER'] ?? '';
+$pass = $_ENV['DB_PASS'] ?? '';
+$db   = $_ENV['DB_NAME'] ?? '';
+
+if (!$host || !$user || !$db) {
+    error_log("HotelLux database configuration is incomplete.");
+    die("Database configuration error.");
 }
 
-// ================= OPTIONAL (IMPORTANT) =================
-// Set charset to avoid encoding issues
+$conn = new mysqli($host, $user, $pass, $db);
+
+if ($conn->connect_error) {
+    error_log("Database connection failed: " . $conn->connect_error);
+    die("Database connection failed. Please try again later.");
+}
+
 $conn->set_charset("utf8mb4");
-
-// ================= OPTIONAL DEBUG MODE =================
-// Uncomment below during development
-// mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
 ?>
