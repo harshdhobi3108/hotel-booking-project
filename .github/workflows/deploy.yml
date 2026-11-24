@@ -34,7 +34,7 @@ jobs:
           protocol: ftp
           local-dir: ./
           server-dir: /htdocs/
-          dry-run: true
+          dry-run: false
           dangerous-clean-slate: false
           exclude: |
             **/.git*
