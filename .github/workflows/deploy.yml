@@ -41,6 +41,9 @@ jobs:
             **/.git*/**
             **/.github/**
             **/node_modules/**
+            **/uploads/**
+            **/debug.txt
+            **/test.php
             **/.env
             **/.env.*
             **/*.sql
